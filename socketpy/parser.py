@@ -1,6 +1,9 @@
 import os
 import sys
 import errno
+from socketpy.excpetions import ParseError, CreateError, CommandError, FileError
+from socketpy.filing import Filer
+
 
 class Parser:
 
@@ -60,37 +63,11 @@ class Parser:
         return self.commands.keys()
 
     def _create_model(self, *args):
-        path = os.path.dirname(os.path.abspath(__file__)) + "/modelos"
-        if not os.path.exists(path):
-            os.mkdir(path)
-
-        flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
-
-        try:
-            file_handle = os.open('modelos/modelos.h', flags)
-        except OSError as e:
-            raise FileError("???")
-        else:  # No exception, so the file must have been created successfully.
-            with os.fdopen(file_handle, 'w') as file_obj:
-                file_obj.write("Look, ma, I'm writing to a new file!")
-        # TODO
+        filer = Filer()
+        filer.create_model_folder("/modelos")
+        filer.create_model_file("modelos/modelos.h", flags = os.O_CREAT | os.O_RDWR)
         return
 
     def _create_socket(self, *args):
         # TODO
         return
-
-class ParseError(Exception):
-    """Base socketpy exception"""
-
-
-class CommandError(ParseError):
-    pass
-
-
-class CreateError(CommandError):
-    pass
-
-
-class FileError(CreateError):
-    pass
