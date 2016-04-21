@@ -64,8 +64,8 @@ class Parser:
 
     def _create_model(self, *args):
         filer = Filer()
-        filer.create_model_folder("/modelos")
-        filer.create_model_file("modelos/modelos.h", flags = os.O_CREAT | os.O_RDWR)
+        filer.copy_models()
+        filer.write_model(*args)
         return
 
     def _create_socket(self, *args):
