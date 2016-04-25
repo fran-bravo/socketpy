@@ -64,10 +64,12 @@ class Parser:
 
     def _create_model(self, *args):
         filer = Filer()
-        filer.copy_models()
-        filer.write_model(*args)
+        filer.copy_files(models=True)
+        filer._write_model(*args)
         return
 
     def _create_socket(self, *args):
-        # TODO
+        filer = Filer()
+        filer.copy_files(sockets=True)
+        filer._write_model(*args)
         return

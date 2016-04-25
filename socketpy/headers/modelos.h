@@ -3,9 +3,5 @@
 
 #include  <commons/collections/list.h>
 
-//Delimiter:
-
-
-
 #endif
 
