@@ -65,11 +65,11 @@ class Parser:
     def _create_model(self, *args):
         filer = Filer()
         filer.copy_files(models=True)
-        filer._write_model(*args)
+        filer.write_file(*args, models=True)
         return
 
     def _create_socket(self, *args):
         filer = Filer()
         filer.copy_files(sockets=True)
-        filer._write_model(*args)
+        filer.write_file(*args, sockets=True)
         return

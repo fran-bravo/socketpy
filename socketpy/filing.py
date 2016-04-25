@@ -31,11 +31,11 @@ class Filer:
         elif sockets:
             self._copy_files("sockets.h")
 
-    def write_file(self, models=False, sockets=False):
+    def write_file(self, *args, models=False, sockets=False):
         if models:
-            self._write_model("modelos.h")
+            self._write_model(*args)
         elif sockets:
-            self._write_socket("sockets.h")
+            self._write_socket(*args)
 
     # Private Methods #
 
