@@ -9,14 +9,20 @@ class Parser:
 
     def __init__(self):
         self.commands = {'help': self.parser_help, 'create': self.create}
+        self.helpers = {'help': [], 'create': ['model', 'socket']}
+        self.filer = Filer()
 
     # Public Interface
 
     # Commands
 
     def parser_help(self, *args):
-        msg = self._msg_format_commands()
-        print("Comandos disponibles: " + msg)
+        if len(args[0]) == 0:
+            msg = self._msg_format_commands()
+            print("Comandos disponibles: " + msg)
+        elif args[0][0] in self.commands:
+            msg = self._help_command(args[0][0])
+            print(msg)
         return msg
 
     def create(self, *args):
@@ -63,13 +69,17 @@ class Parser:
         return self.commands.keys()
 
     def _create_model(self, *args):
-        filer = Filer()
-        filer.copy_files(models=True)
-        filer.write_file(*args, models=True)
+        self.filer.copy_files(models=True)
+        self.filer.write_file(*args, models=True)
         return
 
     def _create_socket(self, *args):
-        filer = Filer()
-        filer.copy_files(sockets=True)
-        filer.write_file(*args, sockets=True)
+        self.filer.copy_files(sockets=True)
+        self.filer.write_file(*args, sockets=True)
         return
+
+    def _help_command(self, command_name):
+        msg = "Las opciones para el comando " + command_name + " son: "
+        for opcion in self.helpers[command_name]:
+            msg += opcion + " "
+        return msg
