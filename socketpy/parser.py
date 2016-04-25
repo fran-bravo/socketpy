@@ -69,13 +69,11 @@ class Parser:
         return self.commands.keys()
 
     def _create_model(self, *args):
-        self.filer.copy_files(models=True)
-        self.filer.write_file(*args, models=True)
+        self.filer.write_model(*args)
         return
 
     def _create_socket(self, *args):
-        self.filer.copy_files(sockets=True)
-        self.filer.write_file(*args, sockets=True)
+        self.filer.copy_templates()
         return
 
     def _help_command(self, command_name):

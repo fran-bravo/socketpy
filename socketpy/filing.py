@@ -1,5 +1,5 @@
 import os
-from shutil import copy
+from shutil import copy, copytree
 
 
 class FileLineWrapper(object):
@@ -21,89 +21,125 @@ class Filer:
         self.working_directory = os.getcwd()
         self.attributes = {}
         self.struct = ""
+        self.defined_struct = ""
+        self.number_struct = 0
+        self.package = ""
         self.lines = ""
+        self.update = False
 
     # Public Interface #
 
-    def copy_files(self, models=False, sockets=False):
-        if models:
-            self._copy_files("modelos.h")
-        elif sockets:
-            self._copy_files("sockets.h")
+    def write_model(self, *args):
+        parameters = args[0]
+        struct = parameters.pop(0)
+        self._read_model_file(struct)
+        self._process_input(parameters, struct)
+        # self.examine_context()
+        self._write_model()
+        self._read_package_file(struct)
+        self._write_package()
+        return
 
-    def write_file(self, *args, models=False, sockets=False):
-        if models:
-            self._write_model(*args)
-        elif sockets:
-            self._write_socket(*args)
+    def examine_context(self):
+        print("Struct: ", self.struct)
+        print("Defined Struct: ", self.defined_struct)
+        print("Package: ", self.package)
+        return
 
     # Private Methods #
 
-    def _copy_files(self, file_name):
-        base_path = os.path.dirname(os.path.abspath(__file__)) + "\headers\\" + file_name
-        path = self.working_directory + "\\" + file_name
+    def copy_templates(self):
+        base_path = os.path.dirname(os.path.abspath(__file__)) + "\headers\\"
+        path = self.working_directory + "\\sockets"
+        print("Base: ", base_path, "Path: ", path)
         if not os.path.exists(path):
-            copy(base_path, path)
+            copytree(base_path, path)
         return path
 
-    def _write_model(self, *args):
-        parameters = args[0]
-        struct = parameters.pop(0)
-        self._process_arguments(parameters)
-        self._process_struct(struct)
-        self._read_file(struct)
-        self._write_file()
+    # File Reading #
 
-    def _write_socket(self, *args):
-        parameters = args[0]
-        struct = parameters.pop(0)
-        # TODO: Diseñar lo que se desea escribir en el archivo
-        # self._process_arguments(parameters)
-        # self._process_struct(struct)
-        # self._read_file(struct)
-        # self._write_file()
-        return
-
-    def _find_line(self):
-        path = self.working_directory + "\modelos.h"
-        fd = FileLineWrapper(open(path, "r"))
-        line = fd.readline()
-        while line != "//Delimiter\n":
-            line = fd.readline()
-        self.line = fd.line + 1
-
-    def _read_file(self, struct):
-        path = self.working_directory + "\modelos.h"
+    def _read_model_file(self, struct):
+        path = self.working_directory + "\sockets\modelos.h"
         fd = FileLineWrapper(open(path, "r"))
         self._inspect_old_struct(struct, fd)
+        return
 
-    def _inspect_old_struct(self, struct, fd):
-        struct_body = False
+    def _read_package_file(self, struct):
+        path = self.working_directory + "\sockets\paquetes.c"
+        fd = FileLineWrapper(open(path, "r"))
+        self._inspect_old_package(struct, fd)
+        return
+
+    # Inner Processing #
+
+    def _inspect_old_struct(self, struct, fd):  # Determina que lineas incluir de modelos.h
+        inside_struct_body = False
         for line in fd.f:
-            if not struct_body:
-                if struct in line:
-                    struct_body = not struct_body
+            self._count_defined_structs(line)
+            self._found_define_struct(line, struct)
+            if line != "\n":  # Ignoro lineas en blanco
+                if inside_struct_body:  # Ignoro de la struct ya definida
+                    if struct in line:  # Delimito el final del typedef
+                        inside_struct_body = not inside_struct_body
                 else:
-                    if line != "\n":
+                    if struct in line:  # Encuentro struct ya definida
+                        inside_struct_body = not inside_struct_body
+                    else:  # Lineas comunes
                         self.lines += line
-            else:
-                if struct in line:
-                    struct_body = not struct_body
+        return
 
-    def _prepare_lines(self):
+    def _inspect_old_package(self, struct, fd):  # Determina que lineas incluir de paquetes.c
+        inside_switch_body = False
+        for line in fd.f:
+            if line != "\n":  # Ignoro lineas en blanco
+                if inside_switch_body:  # Ignoro lineas del switch ya definido
+                    if "break;" in line:  # Delimito el final del switch
+                        inside_switch_body = not inside_switch_body
+                else:
+                    if struct.upper() in line:  # Encuentro switch ya definido
+                        self.update = True
+                        inside_switch_body = not inside_switch_body
+                    else:  # Lineas comunes
+                        self.lines += line
+        return
+
+    def _found_define_struct(self, line, struct):
+        if struct.upper() in line:
+            self.update = True
+            self.number_struct -= 1
+        return
+
+    def _count_defined_structs(self, line):
+        if "#define D" in line:
+            self.number_struct += 1
+        return
+
+    def _prepare_model_lines(self):
         header, footer = self.lines.split("#endif\n")
-        self.lines = header + self.struct + "#endif\n" + footer
+        self.lines = header + self.defined_struct + self.struct + "#endif\n" + footer
+        return
 
-    def _write_file(self):
-        self._prepare_lines()
-        path = self.working_directory + "\modelos.h"
-        fd = FileLineWrapper(open(path, "w"))
-        fd.f.writelines(self.lines)
+    def _prepare_package_lines(self):
+        header, middle, footer = self.lines.split("} //Fin del switch\n")
+        self.lines = header + self.package + "\t} //Fin del switch\n" + middle + self.package + "\t} //Fin del switch\n" + footer
+        return
+
+    def _process_input(self, parameters, struct):
+        self._process_arguments(parameters)
+        self._process_struct(struct)
+        self._define_struct(struct)
+        self._process_package(struct)
+        return
 
     def _process_arguments(self, parameters):
         for par in parameters:
             tipo, selector = self._split_selector(par)
             self.attributes[tipo] = selector
+
+    def _define_struct(self, struct):
+        if not self.update:
+            self.defined_struct = "\n#define D_" + struct.upper() + " " + str(self.number_struct) + "\n"
+        return
 
     def _process_struct(self, struct):
         self.struct = "\ntypedef struct " + struct + "{\n"
@@ -111,6 +147,32 @@ class Filer:
             attr = "\t" + key + " " + str(self.attributes[key]) + ";\n"
             self.struct += attr
         self.struct += "} __attribute__ ((__packed__)) " + struct + ";\n\n"
+        return
+
+    def _process_package(self, struct):
+        self.package = "\n\t\tcase D_" + struct.upper() + \
+                       ":\n\t\t\t//TODO: definir funcion\n\t\t\tbreak;\n\t"
+        return
+
+    # File Writing
+
+    def _write_model(self):
+        self._prepare_model_lines()
+        path = self.working_directory + "\sockets\modelos.h"
+        fd = FileLineWrapper(open(path, "w"))
+        fd.f.writelines(self.lines)
+        self.update = False
+        self.lines = ""
+        return
+
+    def _write_package(self):
+        self._prepare_package_lines()
+        path = self.working_directory + "\sockets\paquetes.c"
+        fd = FileLineWrapper(open(path, "w"))
+        fd.f.writelines(self.lines)
+        return
+
+    # Auxiliary
 
     def _split_selector(self, string):
         tipo, selector = string.split(":")
