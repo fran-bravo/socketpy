@@ -1,6 +1,6 @@
 import os
 from shutil import copy, copytree
-
+from .analyzer import Analyzer
 
 class FileLineWrapper(object):
     def __init__(self, f):
@@ -51,7 +51,7 @@ class Filer:
     def copy_templates(self):
         base_path = os.path.dirname(os.path.abspath(__file__)) + "\headers\\"
         path = self.working_directory + "\\sockets"
-        print("Base: ", base_path, "Path: ", path)
+        # print("Base: ", base_path, "Path: ", path)
         if not os.path.exists(path):
             copytree(base_path, path)
         return path
@@ -134,7 +134,10 @@ class Filer:
     def _process_arguments(self, parameters):
         for par in parameters:
             tipo, selector = self._split_selector(par)
-            self.attributes[tipo] = selector
+            if Analyzer().analyze_type(tipo):
+                self.attributes[selector] = tipo
+            else:
+                raise TypeError('El tipo de dato: ' + tipo + ' no es un tipo valido')
 
     def _define_struct(self, struct):
         if not self.update:
@@ -144,7 +147,7 @@ class Filer:
     def _process_struct(self, struct):
         self.struct = "\ntypedef struct " + struct + "{\n"
         for key in self.attributes.keys():
-            attr = "\t" + key + " " + str(self.attributes[key]) + ";\n"
+            attr = "\t" + str(self.attributes[key]) + " " + key + ";\n"
             self.struct += attr
         self.struct += "} __attribute__ ((__packed__)) " + struct + ";\n\n"
         return
