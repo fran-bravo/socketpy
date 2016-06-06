@@ -106,7 +106,7 @@ class Configure:
         fd.close()
         return
 
-    def _create_packagesh(self):
+    def _create_packagesc(self):
         fd = FileLineWrapper(open(self.headers + "paquetes.c", "w+"))
         fd.f.writelines("""#include "paquetes.h"
 
