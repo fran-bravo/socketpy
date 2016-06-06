@@ -1,8 +1,10 @@
 from setuptools import setup
+from distutils.core import Extension
 
 setup(
     name='socketpy',
     packages=['socketpy'],
+    ext_modules=Extension('headers', sources=['modelos.h', 'paquetes.c', 'paquetes.h']),
     version='v0.0.5',
     description='First description for the module',
     author='Francisco Bravo',
