@@ -1,12 +1,24 @@
 #!/c/Python35/python
 import sys
 import os
+from .parser import Parser, ParseError
 
-path = os.path.dirname(sys.modules[__name__].__file__)
-path = os.path.join(path, '..')
-sys.path.insert(0, path)
 
-import socketpy
+def main(args=None):
+    if args is None:
+        args = sys.argv[1:]
+
+    parser = Parser()
+
+    try:
+        parser.parse(args)
+    except ParseError as exception:
+        sys.stderr.write("ERROR: %s" % exception)
+        sys.stderr.write(os.linesep)
+        sys.exit(1)
+
+    return
+
 
 if __name__ == '__main__':
-    sys.exit(socketpy.main())
+    sys.exit(main())

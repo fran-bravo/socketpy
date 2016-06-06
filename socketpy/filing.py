@@ -115,7 +115,7 @@ class Filer:
         return
 
     def _prepare_model_lines(self):
-        header, footer = self.lines.split("#endif\n")
+        header, footer = self.lines.split("#endif")
         self.lines = header + self.defined_struct + self.struct + "#endif\n" + footer
         return
 
