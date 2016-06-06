@@ -9,7 +9,6 @@ class Analyzer:
         self._get_types()
 
     def analyze_type(self, tipo):
-        print(self.c_array_types)
         return tipo in self.c_built_ins or self._match_array(tipo)
 
     def _match_array(self, tipo):

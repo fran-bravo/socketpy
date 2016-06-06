@@ -17,9 +17,9 @@ class Configure:
         self.create_headers()
 
     def create_db(self):
-        self.cursor.execute("""CREATE TABLE types (type_id INTEGER PRIMARY KEY,
-                                                   type_name VARCHAR(50),
-                                                   type_built_in BIT)""")
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS types (type_id INTEGER PRIMARY KEY,
+                                                                 type_name VARCHAR(50),
+                                                                 type_built_in BIT)""")
         self._load_basic_types()
         self.conn.commit()
         self.cursor.close()
