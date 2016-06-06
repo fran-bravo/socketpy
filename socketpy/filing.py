@@ -51,7 +51,7 @@ class Filer:
     def copy_templates(self):
         base_path = os.path.dirname(os.path.abspath(__file__)) + "\headers\\"
         path = self.working_directory + "\\sockets"
-        # print("Base: ", base_path, "Path: ", path)
+        print("Base: ", base_path, "Path: ", path)
         if not os.path.exists(path):
             copytree(base_path, path)
         return path
