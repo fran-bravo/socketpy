@@ -49,26 +49,26 @@ class Configure:
     def _create_models(self):
         fd = FileLineWrapper(open(self.headers + "modelos.h", "w+"))
         fd.f.writelines("""#ifndef MODELOS_H_
-                            #define MODELOS_H_
+#define MODELOS_H_
 
-                            #include  <commons/collections/list.h>
+#include  <commons/collections/list.h>
 
-                            typedef struct {
-                                int length;
-                                char *data;
-                            } t_stream;
+typedef struct {
+    int length;
+    char *data;
+} t_stream;
 
-                            // Header de stream
-                            typedef struct {
-                                uint8_t tipoEstructura;
-                                uint16_t length;
-                            } __attribute__ ((__packed__)) t_header;
+// Header de stream
+typedef struct {
+    uint8_t tipoEstructura;
+    uint16_t length;
+} __attribute__ ((__packed__)) t_header;
 
-                            // Modelos
+// Modelos
 
 
 
-                            #endif"""
+#endif"""
                         )
         fd.close()
         return
@@ -76,32 +76,32 @@ class Configure:
     def _create_packagesh(self):
         fd = FileLineWrapper(open(self.headers + "paquetes.h", "w+"))
         fd.f.writelines("""#ifndef PAQUETES_H_
-                            #define PAQUETES_H_
+#define PAQUETES_H_
 
-                            #include <stdlib.h>
-                            #include <string.h>
-                            #include <stdio.h>
-                            #include <stdint.h>
-                            #include "string.h"
-                            #include "modelos.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdint.h>
+#include "string.h"
+#include "modelos.h"
 
-                            // Paquetizacion
+// Paquetizacion
 
-                            t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen);
+t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen);
 
-                            // Despaquetizacion
+// Despaquetizacion
 
-                            void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length);
+void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length);
 
-                            // Headers
+// Headers
 
-                            char * crearDataConHeader(uint8_t tipoEstructura, int length);
-                            t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos);
+char * crearDataConHeader(uint8_t tipoEstructura, int length);
+t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos);
 
-                            t_header despaquetizarHeader(char * header);
+t_header despaquetizarHeader(char * header);
 
 
-                            #endif"""
+#endif"""
                         )
         fd.close()
         return
@@ -110,67 +110,67 @@ class Configure:
         fd = FileLineWrapper(open(self.headers + "paquetes.c", "w+"))
         fd.f.writelines("""#include "paquetes.h"
 
-                            // Paquetizacion
+// Paquetizacion
 
-                            t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
-                                t_stream * buffer;
+t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
+    t_stream * buffer;
 
-                                switch(tipoEstructura){
-                                } //Fin del switch
+    switch(tipoEstructura){
+    } //Fin del switch
 
-                                return buffer;
-                            }
+    return buffer;
+}
 
-                            // Despaquetizacion
+// Despaquetizacion
 
-                            void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length){
-                                void * buffer;
+void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length){
+    void * buffer;
 
-                                switch(tipoEstructura){
-                                } //Fin del switch
+    switch(tipoEstructura){
+    } //Fin del switch
 
-                                return buffer;
-                            }
+    return buffer;
+}
 
                             // Headers
 
 
-                            char * crearDataConHeader(uint8_t tipoEstructura, int length){
-                                char * data = malloc(length);
+char * crearDataConHeader(uint8_t tipoEstructura, int length){
+    char * data = malloc(length);
 
-                                uint16_t lengthDatos = length - sizeof(t_header);
+    uint16_t lengthDatos = length - sizeof(t_header);
 
-                                t_header header = crearHeader(tipoEstructura, lengthDatos); //creo el header
+    t_header header = crearHeader(tipoEstructura, lengthDatos); //creo el header
 
-                                int tamanoTotal = 0, tamanoDato = 0;
+    int tamanoTotal = 0, tamanoDato = 0;
 
-                                memcpy(data, &header.tipoEstructura, tamanoDato = sizeof(uint8_t)); //copio el tipoEstructura del header a data
-                                tamanoTotal = tamanoDato;
-                                memcpy(data + tamanoTotal, &header.length, tamanoDato = sizeof(uint16_t)); //copio el length del header a data
+    memcpy(data, &header.tipoEstructura, tamanoDato = sizeof(uint8_t)); //copio el tipoEstructura del header a data
+    tamanoTotal = tamanoDato;
+    memcpy(data + tamanoTotal, &header.length, tamanoDato = sizeof(uint16_t)); //copio el length del header a data
 
-                                return data;
-                            }
+    return data;
+}
 
-                            t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos){
-                                t_header header;
-                                header.tipoEstructura = tipoEstructura;
-                                header.length = lengthDatos;
-                                return header;
-                            }
+t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos){
+    t_header header;
+    header.tipoEstructura = tipoEstructura;
+    header.length = lengthDatos;
+    return header;
+}
 
-                            t_header despaquetizarHeader(char * header){
-                                t_header estructuraHeader;
+t_header despaquetizarHeader(char * header){
+    t_header estructuraHeader;
 
-                                int tamanoTotal = 0, tamanoDato = 0;
-                                memcpy(&estructuraHeader.tipoEstructura, header + tamanoTotal, tamanoDato = sizeof(uint8_t));
-                                tamanoTotal = tamanoDato;
-                                memcpy(&estructuraHeader.length, header + tamanoTotal, tamanoDato = sizeof(uint16_t));
+    int tamanoTotal = 0, tamanoDato = 0;
+    memcpy(&estructuraHeader.tipoEstructura, header + tamanoTotal, tamanoDato = sizeof(uint8_t));
+    tamanoTotal = tamanoDato;
+    memcpy(&estructuraHeader.length, header + tamanoTotal, tamanoDato = sizeof(uint16_t));
 
-                                return estructuraHeader;
-                            }
+    return estructuraHeader;
+}
 
 
-                            #endif"""
+#endif"""
                         )
         fd.close()
         return
