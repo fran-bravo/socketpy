@@ -6,9 +6,13 @@ import pytest
 class TestParser(TestCase):
     parser = Parser()
 
-    def test_parse_command(self):
-        result = self.parser.parse(["help", "uno", "dos"])
+    def test_parse_command_help(self):
+        result = self.parser.parse(["help", "test"])
         assert result == "help"
+
+    def test_parse_command_create(self):
+        result = self.parser.parse(["create", "socket", "test"])
+        assert result == "create"
 
     def test_parse_fail(self):
         with pytest.raises(ParseError):
