@@ -23,3 +23,6 @@ class TestAnalyzer(TestCase):
 
     def test_analyze_wrong_array_type(self):
         assert self.analyzer.analyze_type("Boolean[32]") == False
+
+    def test_analyze_wrong_array_not_numbers(self):
+        assert self.analyzer.analyze_type("Boolean[asd]") == False

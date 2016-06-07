@@ -1,6 +1,5 @@
 import sqlite3, os
-from socketpy.excpetions import FileError
-from socketpy.filing import Filer, FileLineWrapper
+from socketpy.filing import FileLineWrapper
 
 
 class Configure:
@@ -39,12 +38,22 @@ class Configure:
                  ("uint16_t*", 1), ("uint32_t*", 1),
                  ("void*", 1), ("char*", 1),
                  ]
-        self.cursor.executemany("INSERT INTO types VALUES(NULL, ?,?)", types)
+        if not self._validate_types(types):
+            self.cursor.executemany("INSERT INTO types VALUES(NULL, ?,?)", types)
 
     @staticmethod
     def _create_directory(directory):
         if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), directory)):
             os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), directory))
+
+    def _validate_types(self, types):
+        c_built_ins = list(map(lambda tup: tup[0], self.cursor.execute(
+            'SELECT type_name FROM types WHERE type_built_in = 1 ORDER BY type_id')))
+
+        type_names = list(map(lambda tup: tup[0], types))
+        return type_names == c_built_ins
+
+    #   Templates Creation  #
 
     def _create_models(self):
         fd = FileLineWrapper(open(os.path.join(self.headers, "modelos.h"), "w+"))

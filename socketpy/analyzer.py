@@ -18,7 +18,7 @@ class Analyzer:
             return False
 
     def _get_types(self):
-        database = os.path.dirname(os.path.abspath(__file__)) + "\\database\\types.db"
+        database = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database"), "types.db")
         conn = sqlite3.connect(database)
         cursor = conn.cursor()
         self.c_built_ins = list(map(lambda tup: tup[0], cursor.execute('SELECT type_name FROM types WHERE type_built_in = 1 ORDER BY type_id')))
