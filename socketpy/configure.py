@@ -7,10 +7,10 @@ class Configure:
 
     def __init__(self):
         self.working_directory = os.getcwd()
-        self._create_directory("\\database")
-        self._create_directory("\\headers")
-        self.database = os.path.dirname(os.path.abspath(__file__)) + "\\database\\types.db"
-        self.headers = os.path.dirname(os.path.abspath(__file__)) + "\\headers\\"
+        self._create_directory("database")
+        self._create_directory("headers")
+        self.database = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database"), "types.db")
+        self.headers = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
         self.conn = sqlite3.connect(self.database)
         self.cursor = self.conn.cursor()
         self.create_db()
@@ -43,11 +43,11 @@ class Configure:
 
     @staticmethod
     def _create_directory(directory):
-        if not os.path.exists(os.path.dirname(os.path.abspath(__file__)) + directory):
-            os.makedirs(os.path.dirname(os.path.abspath(__file__)) + directory)
+        if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), directory)):
+            os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), directory))
 
     def _create_models(self):
-        fd = FileLineWrapper(open(self.headers + "modelos.h", "w+"))
+        fd = FileLineWrapper(open(os.path.join(self.headers, "modelos.h"), "w+"))
         fd.f.writelines("""#ifndef MODELOS_H_
 #define MODELOS_H_
 
@@ -74,7 +74,7 @@ typedef struct {
         return
 
     def _create_packagesh(self):
-        fd = FileLineWrapper(open(self.headers + "paquetes.h", "w+"))
+        fd = FileLineWrapper(open(os.path.join(self.headers, "paquetes.h"), "w+"))
         fd.f.writelines("""#ifndef PAQUETES_H_
 #define PAQUETES_H_
 
@@ -107,7 +107,7 @@ t_header despaquetizarHeader(char * header);
         return
 
     def _create_packagesc(self):
-        fd = FileLineWrapper(open(self.headers + "paquetes.c", "w+"))
+        fd = FileLineWrapper(open(os.path.join(self.headers,  "paquetes.c"), "w+"))
         fd.f.writelines("""#include "paquetes.h"
 
 // Paquetizacion

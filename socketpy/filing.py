@@ -2,6 +2,7 @@ import os
 from shutil import copy, copytree
 from .analyzer import Analyzer
 
+
 class FileLineWrapper(object):
     def __init__(self, f):
         self.f = f
@@ -49,8 +50,8 @@ class Filer:
     # Private Methods #
 
     def copy_templates(self):
-        base_path = os.path.dirname(os.path.abspath(__file__)) + "\headers\\"
-        path = self.working_directory + "\\sockets"
+        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
+        path = os.path.join(self.working_directory, "sockets")
         print("Base: ", base_path, "Path: ", path)
         if not os.path.exists(path):
             copytree(base_path, path)
@@ -59,13 +60,13 @@ class Filer:
     # File Reading #
 
     def _read_model_file(self, struct):
-        path = self.working_directory + "\sockets\modelos.h"
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), "modelos.h")
         fd = FileLineWrapper(open(path, "r"))
         self._inspect_old_struct(struct, fd)
         return
 
     def _read_package_file(self, struct):
-        path = self.working_directory + "\sockets\paquetes.c"
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
         fd = FileLineWrapper(open(path, "r"))
         self._inspect_old_package(struct, fd)
         return
@@ -161,7 +162,7 @@ class Filer:
 
     def _write_model(self):
         self._prepare_model_lines()
-        path = self.working_directory + "\sockets\modelos.h"
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), "modelos.h")
         fd = FileLineWrapper(open(path, "w"))
         fd.f.writelines(self.lines)
         self.update = False
@@ -170,7 +171,7 @@ class Filer:
 
     def _write_package(self):
         self._prepare_package_lines()
-        path = self.working_directory + "\sockets\paquetes.c"
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
         fd = FileLineWrapper(open(path, "w"))
         fd.f.writelines(self.lines)
         return
