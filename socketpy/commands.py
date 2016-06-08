@@ -60,3 +60,8 @@ class ConfigCommand(Command):
     def do_execute(self, parser, *args):
         print("Configurando\n")
         conf = Configure()
+        conf.initialize_directories()
+        conf.create_db()
+        conf.create_headers()
+        conf.gather_types()
+        conf.close_connection()

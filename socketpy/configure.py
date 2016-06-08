@@ -1,4 +1,4 @@
-import sqlite3, os
+import sqlite3, os, re
 from socketpy.filing import FileLineWrapper
 
 
@@ -6,14 +6,14 @@ class Configure:
 
     def __init__(self):
         self.working_directory = os.getcwd()
-        self._create_directory("database")
-        self._create_directory("headers")
         self.database = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database"), "types.db")
         self.headers = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
         self.conn = sqlite3.connect(self.database)
         self.cursor = self.conn.cursor()
-        self.create_db()
-        self.create_headers()
+
+    def initialize_directories(self):
+        self._create_directory("database")
+        self._create_directory("headers")
 
     def create_db(self):
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS types (type_id INTEGER PRIMARY KEY,
@@ -21,6 +21,8 @@ class Configure:
                                                                  type_built_in BIT)""")
         self._load_basic_types()
         self.conn.commit()
+
+    def close_connection(self):
         self.cursor.close()
         self.conn.close()
 
@@ -30,6 +32,39 @@ class Configure:
         self._create_packagesc()
         return
 
+    def gather_types(self):
+        directories = list(os.walk(self.working_directory))
+        for dir in directories:
+            root, subdirs, files = dir
+            for fd in files:
+                if fd.endswith(".c") or fd.endswith(".h"):
+                    self._analyze_file(os.path.join(root, fd))
+
+    def _analyze_file(self, file):
+        print(file)
+        struct_body = False
+        fd = FileLineWrapper(open(file))
+        for line in fd.f:
+            if line.startswith("typedef") and line.endswith("{"):
+                struct_body = not struct_body
+            if line.startswith("typedef") and line.endswith(";\n"):
+                tipo = line.split(" ")[-1]
+                tipo = re.sub('[;\n]', '', tipo)
+                self._add_type(tipo)
+            if line.startswith("}"):
+                struct_body = not struct_body
+                tipo = re.sub('[;}\ \n]', '', line)
+                if tipo.startswith("__"):
+                    tipo = tipo.split("))")[1]
+                if tipo != "":
+                    self._add_type(tipo)
+
+    def _add_type(self, tipo):
+        if not self._validate_type(tipo):
+            self.cursor.execute("INSERT INTO types VALUES(NULL,?,?)", (tipo, 0))
+            self.cursor.execute("INSERT INTO types VALUES(NULL,?,?)", (tipo+"*", 0))
+            self.conn.commit()
+
     def _load_basic_types(self):
         types = [("int", 1), ("uint8_t", 1),
                  ("uint16_t", 1), ("uint32_t", 1),
@@ -38,13 +73,21 @@ class Configure:
                  ("uint16_t*", 1), ("uint32_t*", 1),
                  ("void*", 1), ("char*", 1),
                  ]
+        self._insert_types(types)
+
+    def _insert_types(self, types):
         if not self._validate_types(types):
-            self.cursor.executemany("INSERT INTO types VALUES(NULL, ?,?)", types)
+            self.cursor.executemany("INSERT INTO types VALUES(NULL,?,?)", types)
 
     @staticmethod
     def _create_directory(directory):
         if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), directory)):
             os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), directory))
+
+    def _validate_type(self, tipo):
+        c_built_ins = list(map(lambda tup: tup[0], self.cursor.execute(
+            'SELECT type_name FROM types WHERE type_built_in = 1 ORDER BY type_id')))
+        return tipo in c_built_ins
 
     def _validate_types(self, types):
         c_built_ins = list(map(lambda tup: tup[0], self.cursor.execute(
