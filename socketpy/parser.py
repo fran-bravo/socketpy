@@ -1,15 +1,11 @@
-import os
-import sys
-import errno
-from socketpy.excpetions import ParseError, CommandError, FileError
-from socketpy.filing import Filer
-from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand
+from socketpy.excpetions import CommandError, ParseError
+from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand
 
 
 class Parser:
 
     def __init__(self):
-        self.commands = {'help': self.parser_help, 'create': self.create, 'config': self.config}
+        self.commands = {'help': self.parser_help, 'create': self.create, 'config': self.config, 'flush':self.flush}
         self.helpers = {'help': [], 'create': ['model', 'socket']}
 
     # Public Interface
@@ -27,6 +23,10 @@ class Parser:
     def config(self, *args):
         ConfigCommand().do_execute(self, *args)
         return "config"
+
+    def flush(self, *args):
+        FlushCommand().do_execute(self, *args)
+        return "flush"
 
     # Parse
 

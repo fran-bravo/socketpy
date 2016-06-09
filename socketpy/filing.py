@@ -26,7 +26,9 @@ class Filer:
         self.number_struct = 0
         self.package = ""
         self.lines = ""
+        self.includes = ""
         self.update = False
+        self.analyzer = Analyzer()
 
     # Public Interface #
 
@@ -117,7 +119,7 @@ class Filer:
 
     def _prepare_model_lines(self):
         header, footer = self.lines.split("#endif")
-        self.lines = header + self.defined_struct + self.struct + "#endif\n" + footer
+        self.lines = header + self.includes + self.defined_struct + self.struct + "#endif\n" + footer
         return
 
     def _prepare_package_lines(self):
@@ -135,10 +137,15 @@ class Filer:
     def _process_arguments(self, parameters):
         for par in parameters:
             tipo, selector = self._split_selector(par)
-            if Analyzer().analyze_type(tipo):
+            if self.analyzer.analyze_type(tipo):
                 self.attributes[selector] = tipo
+                if self.analyzer.source_type:
+                    self._add_include()
             else:
                 raise TypeError('El tipo de dato: ' + tipo + ' no es un tipo valido')
+
+    def _add_include(self):
+        self.includes += "#include <" + self.analyzer.source_file + ">\n"
 
     def _define_struct(self, struct):
         if not self.update:
@@ -154,7 +161,7 @@ class Filer:
         return
 
     def _process_package(self, struct):
-        self.package = "\n\t\tcase D_" + struct.upper() + \
+        self.package = "\tcase D_" + struct.upper() + \
                        ":\n\t\t\t//TODO: definir funcion\n\t\t\tbreak;\n\t"
         return
 

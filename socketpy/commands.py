@@ -1,6 +1,8 @@
+import sqlite3
 from socketpy.excpetions import CreateError, FileError
 from socketpy.filing import Filer
 from socketpy.configure import Configure
+from socketpy.db import Database
 
 class Command():
 
@@ -65,3 +67,11 @@ class ConfigCommand(Command):
         conf.create_headers()
         conf.gather_types()
         conf.close_connection()
+
+
+class FlushCommand(Command):
+
+    def do_execute(self, parser, *args):
+        db = Database()
+        db.flush_db()
+        db.close_connection()
