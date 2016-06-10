@@ -75,3 +75,12 @@ class FlushCommand(Command):
         db = Database()
         db.flush_db()
         db.close_connection()
+
+
+class DeleteCommand(Command):
+
+    def __init__(self):
+        self.filer = Filer()
+
+    def do_execute(self, parser, *args):
+        self.filer.delete_sockets()

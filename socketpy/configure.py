@@ -34,10 +34,11 @@ class Configure:
             for fd in files:
                 if fd.endswith(".c") or fd.endswith(".h"):
                     self._analyze_file(root, fd)
+                    print("\tNo hay más tipos de dato en el archivo\n")
 
     def _analyze_file(self, root, source):
         file = os.path.join(root, source)
-        print(file)
+        print("Procesando archivo: ", source)
         struct_body = False
         fd = FileLineWrapper(open(file))
         for line in fd.f:
@@ -56,12 +57,12 @@ class Configure:
                     self.database.insert_type(tipo, source)
 
     def _load_basic_types(self):
-        types = [("int", 1, "builtin"), ("uint8_t", 1, "builtin"),
-                 ("uint16_t", 1, "builtin"), ("uint32_t", 1, "builtin"),
-                 ("void", 1, "builtin"), ("char", 1, "builtin"),
-                 ("int*", 1, "builtin"), ("uint8_t*", 1, "builtin"),
-                 ("uint16_t*", 1, "builtin"), ("uint32_t*", 1, "builtin"),
-                 ("void*", 1, "builtin"), ("char*", 1, "builtin"),
+        types = [("int", "builtin"), ("uint8_t", "builtin"),
+                 ("uint16_t", "builtin"), ("uint32_t", "builtin"),
+                 ("void", "builtin"), ("char", "builtin"),
+                 ("int*", "builtin"), ("uint8_t*", "builtin"),
+                 ("uint16_t*", "builtin"), ("uint32_t*", "builtin"),
+                 ("void*", "builtin"), ("char*", "builtin"),
                  ]
         self.database.insert_types(types)
 

@@ -1,7 +1,7 @@
 import os
-from shutil import copy, copytree
+from shutil import rmtree, copytree
 from .analyzer import Analyzer
-
+from socketpy.excpetions import FileError
 
 class FileLineWrapper(object):
     def __init__(self, f):
@@ -48,6 +48,12 @@ class Filer:
         print("Defined Struct: ", self.defined_struct)
         print("Package: ", self.package)
         return
+
+    def delete_sockets(self):
+        try:
+            rmtree(os.path.join(self.working_directory, "sockets"))
+        except OSError as e:
+            raise FileError(e)
 
     # Private Methods #
 

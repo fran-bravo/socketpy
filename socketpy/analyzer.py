@@ -14,7 +14,6 @@ class Analyzer:
         self.source_file = ""
 
     def analyze_type(self, tipo):
-        print(self.c_array_types)
         if tipo in self.c_types or self._match_array(tipo, self.c_array_types):
             self.source_type = True
             self._get_source(tipo)
@@ -35,7 +34,6 @@ class Analyzer:
         db = Database()
         query = "SELECT type_source FROM types WHERE type_name = '" + tipo + "' ORDER BY type_id"
         self.source_file = list(db.execute_query(query))[0][0]
-        print(self.source_file)
         db.close_connection()
 
     def _get_types(self):
