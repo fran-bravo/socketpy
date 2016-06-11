@@ -14,14 +14,23 @@ class Analyzer:
         self.source_file = ""
 
     def analyze_type(self, tipo):
-        if tipo in self.c_types or self._match_array(tipo, self.c_array_types):
-            self.source_type = True
-            self._get_source(tipo)
-            return self.source_type
+        if not self.c_types:
+            return self._validate_built_in(tipo)
         else:
-            self.source_type = False
-            self.source_file = "builtin"
-            return tipo in self.c_built_ins or self._match_array(tipo, self.c_built_in_array_types)
+            if tipo in self.c_types or self._match_array(tipo, self.c_array_types):
+                return self._validate_source(tipo)
+            else:
+                return self._validate_built_in(tipo)
+
+    def _validate_source(self, tipo):
+        self.source_type = True
+        self._get_source(tipo)
+        return self.source_type
+
+    def _validate_built_in(self, tipo):
+        self.source_type = False
+        self.source_file = "builtin"
+        return tipo in self.c_built_ins or self._match_array(tipo, self.c_built_in_array_types)
 
     @staticmethod
     def _match_array(tipo, array):

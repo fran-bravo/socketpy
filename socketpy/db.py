@@ -26,9 +26,12 @@ class Database:
     def insert_type(self, tipo, source):
         if not self._validate_type(tipo):
             self.cursor.execute("INSERT INTO types VALUES(NULL,?,?)", (tipo, source))
-            self.cursor.execute("INSERT INTO types VALUES(NULL,?,?)", (tipo + "*", source))
-            self.conn.commit()
             print("\tInsertado tipo de dato: ", tipo)
+            self.cursor.execute("INSERT INTO types VALUES(NULL,?,?)", (tipo + "*", source))
+            print("\tInsertado tipo de dato: ", tipo + "*")
+            self.conn.commit()
+        else:
+            print("\tEl tipo de dato ya estaba en la base")
 
     def insert_types(self, types):
         if not self._validate_types(types):

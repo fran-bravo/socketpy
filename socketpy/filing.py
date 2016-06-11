@@ -3,6 +3,7 @@ from shutil import rmtree, copytree
 from .analyzer import Analyzer
 from socketpy.excpetions import FileError
 
+
 class FileLineWrapper(object):
     def __init__(self, f):
         self.f = f
@@ -41,7 +42,7 @@ class Filer:
         self._write_model()
         self._read_package_file(struct)
         self._write_package()
-        return
+        return struct
 
     def examine_context(self):
         print("Struct: ", self.struct)
@@ -51,7 +52,9 @@ class Filer:
 
     def delete_sockets(self):
         try:
+            print("Borrando sockets")
             rmtree(os.path.join(self.working_directory, "sockets"))
+            print("Sockets borrados")
         except OSError as e:
             raise FileError(e)
 
@@ -60,20 +63,23 @@ class Filer:
     def copy_templates(self):
         base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
         path = os.path.join(self.working_directory, "sockets")
-        print("Base: ", base_path, "Path: ", path)
+        # print("Base: ", base_path, "Path: ", path)
         if not os.path.exists(path):
             copytree(base_path, path)
+            print("\tCopiados templates de sockets")
         return path
 
     # File Reading #
 
     def _read_model_file(self, struct):
+        print("\tLeyendo archivo de modelos")
         path = os.path.join(os.path.join(self.working_directory, "sockets"), "modelos.h")
         fd = FileLineWrapper(open(path, "r"))
         self._inspect_old_struct(struct, fd)
         return
 
     def _read_package_file(self, struct):
+        print("\tLeyendo archivos de paquetes")
         path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
         fd = FileLineWrapper(open(path, "r"))
         self._inspect_old_package(struct, fd)
@@ -134,6 +140,7 @@ class Filer:
         return
 
     def _process_input(self, parameters, struct):
+        print("\tProcesando input")
         self._process_arguments(parameters)
         self._process_struct(struct)
         self._define_struct(struct)
@@ -151,7 +158,8 @@ class Filer:
                 raise TypeError('El tipo de dato: ' + tipo + ' no es un tipo valido')
 
     def _add_include(self):
-        self.includes += "#include <" + self.analyzer.source_file + ">\n"
+        if (self.analyzer.source_file not in self.lines) and (self.analyzer.source_file != "modelos.h"):
+            self.includes += "#include <" + self.analyzer.source_file + ">\n"
 
     def _define_struct(self, struct):
         if not self.update:
@@ -174,6 +182,7 @@ class Filer:
     # File Writing
 
     def _write_model(self):
+        print("\tEscribiendo modelos")
         self._prepare_model_lines()
         path = os.path.join(os.path.join(self.working_directory, "sockets"), "modelos.h")
         fd = FileLineWrapper(open(path, "w"))
@@ -183,6 +192,7 @@ class Filer:
         return
 
     def _write_package(self):
+        print("\tEscribiendo paquetes")
         self._prepare_package_lines()
         path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
         fd = FileLineWrapper(open(path, "w"))

@@ -29,6 +29,7 @@ class CreateCommand(Command):
 
     def __init__(self):
         self.filer = Filer()
+        self.db = Database()
 
     def do_execute(self, parser, *args):
         if len(args[0]) == 0:
@@ -49,7 +50,10 @@ class CreateCommand(Command):
             raise CreateError(exc)
 
     def _create_model(self, *args):
-        self.filer.write_model(*args)
+        print("Escribiendo estructuras y funcoines asociadas al modelo")
+        model = self.filer.write_model(*args)
+        print("Insertando modelo en base de datos")
+        self.db.insert_type(model, "modelos.h")
         return
 
     def _create_socket(self, *args):

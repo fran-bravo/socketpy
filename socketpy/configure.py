@@ -1,4 +1,4 @@
-import sqlite3, os, re
+import sqlite3, os, re, sys
 from socketpy.filing import FileLineWrapper
 from socketpy.db import Database
 
@@ -9,6 +9,8 @@ class Configure:
         self.working_directory = os.getcwd()
         self.headers = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
         self.database = Database()
+
+    # Public Interface #
 
     def initialize_directories(self):
         self._create_directory("database")
@@ -36,12 +38,16 @@ class Configure:
                     self._analyze_file(root, fd)
                     print("\tNo hay más tipos de dato en el archivo\n")
 
+    # Private Methods #
+
     def _analyze_file(self, root, source):
         file = os.path.join(root, source)
         print("Procesando archivo: ", source)
         struct_body = False
         fd = FileLineWrapper(open(file))
         for line in fd.f:
+            if line.startswith("#include"):
+                self._inspect_include(line)
             if line.startswith("typedef") and line.endswith("{"):
                 struct_body = not struct_body
             if line.startswith("typedef") and line.endswith(";\n"):
@@ -55,6 +61,19 @@ class Configure:
                     tipo = tipo.split("))")[1]
                 if tipo != "":
                     self.database.insert_type(tipo, source)
+
+    @staticmethod
+    def _inspect_include(self, line):
+        if "<" in line:
+            file = line.split("<")[-1]
+            file = re.sub('[>\n]', '', file)
+        if "\"" in line:
+            file = line.split("\"")[-2]
+        print(os.path.abspath(file))
+        root = os.path.splitdrive(sys.executable)[0]
+        print("Raiz: ", root, "Archivo: ", file)
+        for dir, subdirs, files in os.walk(root):
+            print(dir)
 
     def _load_basic_types(self):
         types = [("int", "builtin"), ("uint8_t", "builtin"),

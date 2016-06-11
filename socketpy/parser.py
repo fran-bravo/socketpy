@@ -55,8 +55,10 @@ class Parser:
 
     def _msg_format_commands(self):
         comandos = self._get_commands()
-        msg = " , ".join(comandos)
+        msg = ", ".join(comandos)
         return msg
 
     def _get_commands(self):
-        return self.commands.keys()
+        comandos = list(self.commands.keys())
+        comandos.sort()
+        return comandos
