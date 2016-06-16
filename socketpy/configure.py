@@ -73,16 +73,12 @@ class Configure:
             file = re.sub('[>\n]', '', file)
         if "\"" in line:
             file = line.split("\"")[-2]
-
-        root = os.path.splitdrive(sys.executable)[0]
-        root = os.path.join(root, os.sep)
-        root = os.path.join(root, "lib")
-        for dir, subdirs, files in os.walk(root):
-            if file in files:
-                self._analyze_file(root, file)
-                print("\tNo hay más tipos de dato en el archivo\n")
-                break
-
+        for root in self.database.get_routes():
+            for dir, subdirs, files in os.walk(root):
+                if file in files:
+                    self._analyze_file(dir, file)
+                    print("\tNo hay más tipos de dato en el archivo\n")
+                    break
 
     def _load_basic_types(self):
         types = [("int", "builtin"), ("uint8_t", "builtin"),

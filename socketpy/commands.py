@@ -47,6 +47,9 @@ class CreateCommand(Command):
                 self._create_model(parameters)
             elif tipo.lower() == "socket":
                 self._create_socket(parameters)
+            else:
+                msg = "Opcion invalida para el comando create"
+                raise CreateError(msg)
         except FileError as exc:
             raise CreateError(exc)
 
@@ -77,9 +80,26 @@ class ConfigCommand(Command):
 class FlushCommand(Command):
 
     def do_execute(self, parser, *args):
-        db = Database()
-        db.flush_db()
-        db.close_connection()
+        if len(args[0]) == 0:
+            msg = "Faltan parametros\n"
+            msg += "Las opciones para el comando flush son: -"
+            for opcion in parser.helpers["flush"]:
+                msg += opcion + " "
+            raise CreateError(msg)
+        else:
+            parameters = list(args)[0]
+            tipo = parameters.pop(0)
+        try:
+            if tipo.lower() == "types":
+                db = Database()
+                db.flush_types()
+                db.close_connection()
+            elif tipo.lower() == "routes":
+                db = Database()
+                db.flush_routes()
+                db.close_connection()
+        except FileError as exc:
+            raise CreateError(exc)
 
 
 class DeleteCommand(Command):
@@ -101,9 +121,6 @@ class RouteCommand(Command):
         else:
             parameters = list(args)[0]
             router = Route()
-            print("Instanciado route")
             router.create_route_table()
-            print("Creada route table")
             router.load_route(parameters)
-            print("Cargada ruta")
             router.close_connection()

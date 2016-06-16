@@ -16,7 +16,11 @@ class Route:
 
     def load_route(self, directorios):
         route = os.sep.join(directorios)
+        print("Ruta a insertar: ", route)
         self.database.insert_route(route)
+
+    def flush_routes(self):
+        self.database.flush_routes()
 
     def close_connection(self):
         self.database.close_connection()

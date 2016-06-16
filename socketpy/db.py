@@ -39,7 +39,6 @@ class Database:
             print("\tEl tipo de dato ya estaba en la base")
 
     def insert_route(self, route):
-        print("Ruta ", route)
         if not self._validate_route(route):
             self.cursor.execute("INSERT INTO routes VALUES(NULL,?)", (route, ))
             print("\tInsertada ruta: ", route)
@@ -52,10 +51,15 @@ class Database:
             self.cursor.executemany("INSERT INTO types VALUES(NULL,?,?)", types)
             self.conn.commit()
 
-    def flush_db(self):
+    def flush_types(self):
         self.cursor.execute("""DELETE FROM types WHERE type_source != 'builtin';""")
         self.conn.commit()
-        print("Eliminados registros de la base de datos")
+        print("Eliminados registros de la tabla tipos")
+
+    def flush_routes(self):
+        self.cursor.execute("""DELETE FROM routes;""")
+        self.conn.commit()
+        print("Eliminados registros de la tabla rutas")
 
     def close_connection(self):
         self.cursor.close()
@@ -64,10 +68,10 @@ class Database:
     #   Private Methods #
 
     def _validate_type(self, tipo):
-        return tipo in self._get_types()
+        return tipo in self.get_types()
 
     def _validate_route(self, route):
-        return route in self._get_routes()
+        return route in self.get_routes()
 
     def _validate_types(self, types):
         type_names = list(map(lambda tup: tup[0], types))
@@ -76,10 +80,10 @@ class Database:
             not_in_db = not_in_db and self._validate_type(type)
         return not_in_db
 
-    def _get_types(self):
+    def get_types(self):
         return list(map(lambda tup: tup[0], self.cursor.execute(
                     "SELECT type_name FROM types ORDER BY type_id")))
 
-    def _get_routes(self):
+    def get_routes(self):
         return list(map(lambda tup: tup[0], self.cursor.execute(
             "SELECT route FROM routes ORDER BY route_id")))

@@ -1,4 +1,4 @@
-from socketpy.excpetions import CommandError, ParseError
+from socketpy.excpetions import CommandError, ParseError, SOCKETPY_ERRORS
 from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand, DeleteCommand, RouteCommand
 
 
@@ -8,7 +8,8 @@ class Parser:
         self.commands = {'help': self.parser_help, 'create': self.create,
                          'config': self.config, 'flush': self.flush,
                          'delete': self.delete, 'route': self.route}
-        self.helpers = {'help': [], 'create': ['model', 'socket']}
+        self.helpers = {'help': [], 'create': ['model', 'socket'], 'config': [],
+                        'flush': ['types', 'routes'], 'delete': [], 'route': []}
 
     # Public Interface
 
@@ -51,9 +52,12 @@ class Parser:
 
         try:
             return self.commands[command](*args)
-        except KeyError:
-            msg = ['Unknown command "%s"' % command]
-            raise CommandError(' - '.join(msg))
+        except Exception as exc:
+            if type(exc) in SOCKETPY_ERRORS:
+                raise ParseError(exc)
+            else:
+                msg = ['Unknown command "%s"' % command]
+                raise CommandError(' - '.join(msg))
 
     # Private Methods
 
