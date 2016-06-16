@@ -1,5 +1,5 @@
 from socketpy.excpetions import CommandError, ParseError
-from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand, DeleteCommand
+from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand, DeleteCommand, RouteCommand
 
 
 class Parser:
@@ -7,7 +7,7 @@ class Parser:
     def __init__(self):
         self.commands = {'help': self.parser_help, 'create': self.create,
                          'config': self.config, 'flush': self.flush,
-                         'delete': self.delete}
+                         'delete': self.delete, 'route': self.route}
         self.helpers = {'help': [], 'create': ['model', 'socket']}
 
     # Public Interface
@@ -25,6 +25,10 @@ class Parser:
     def delete(self, *args):
         DeleteCommand().do_execute(self, *args)
         return "delete"
+
+    def route(self, *args):
+        RouteCommand().do_execute(self, *args)
+        return "route"
 
     def config(self, *args):
         ConfigCommand().do_execute(self, *args)

@@ -12,3 +12,10 @@ class CreateError(CommandError):
 
 class FileError(CreateError):
     pass
+
+
+class RouteError(CommandError):
+    pass
+
+
+SOCKETPY_ERRORS = [ParseError, CommandError, CreateError, RouteError, FileError]

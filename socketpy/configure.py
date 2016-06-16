@@ -17,7 +17,7 @@ class Configure:
         self._create_directory("headers")
 
     def create_db(self):
-        self.database.create_db()
+        self.database.create_types_table()
         self._load_basic_types()
 
     def close_connection(self):
@@ -41,6 +41,7 @@ class Configure:
     # Private Methods #
 
     def _analyze_file(self, root, source):
+        print("Raiz ", root)
         file = os.path.join(root, source)
         print("Procesando archivo: ", source)
         struct_body = False
@@ -51,8 +52,11 @@ class Configure:
             if line.startswith("typedef") and line.endswith("{"):
                 struct_body = not struct_body
             if line.startswith("typedef") and line.endswith(";\n"):
-                tipo = line.split(" ")[-1]
+                linea = line.split(" ")
+                linea.remove("typedef")
+                tipo = linea[-1]
                 tipo = re.sub('[;\n]', '', tipo)
+                print(tipo)
                 self.database.insert_type(tipo, source)
             if line.startswith("}"):
                 struct_body = not struct_body
@@ -62,18 +66,23 @@ class Configure:
                 if tipo != "":
                     self.database.insert_type(tipo, source)
 
-    @staticmethod
     def _inspect_include(self, line):
+        print("Inspecting include ", line)
         if "<" in line:
             file = line.split("<")[-1]
             file = re.sub('[>\n]', '', file)
         if "\"" in line:
             file = line.split("\"")[-2]
-        print(os.path.abspath(file))
+
         root = os.path.splitdrive(sys.executable)[0]
-        print("Raiz: ", root, "Archivo: ", file)
+        root = os.path.join(root, os.sep)
+        root = os.path.join(root, "lib")
         for dir, subdirs, files in os.walk(root):
-            print(dir)
+            if file in files:
+                self._analyze_file(root, file)
+                print("\tNo hay más tipos de dato en el archivo\n")
+                break
+
 
     def _load_basic_types(self):
         types = [("int", "builtin"), ("uint8_t", "builtin"),

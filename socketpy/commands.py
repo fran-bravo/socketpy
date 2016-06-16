@@ -1,8 +1,9 @@
 import sqlite3
-from socketpy.excpetions import CreateError, FileError
+from socketpy.excpetions import CreateError, FileError, RouteError
 from socketpy.filing import Filer
 from socketpy.configure import Configure
 from socketpy.db import Database
+from socketpy.route import Route
 
 class Command():
 
@@ -34,7 +35,7 @@ class CreateCommand(Command):
     def do_execute(self, parser, *args):
         if len(args[0]) == 0:
             msg = "Faltan parametros\n"
-            msg += "Las opciones para el comando help son: -"
+            msg += "Las opciones para el comando create son: -"
             for opcion in parser.helpers["create"]:
                 msg += opcion + " "
             raise CreateError(msg)
@@ -88,3 +89,21 @@ class DeleteCommand(Command):
 
     def do_execute(self, parser, *args):
         self.filer.delete_sockets()
+
+
+class RouteCommand(Command):
+
+    def do_execute(self, parser, *args):
+        if len(args[0]) == 0:
+            msg = "Faltan parametros\n"
+            msg += "Falta la ruta para el comando route"
+            raise RouteError(msg)
+        else:
+            parameters = list(args)[0]
+            router = Route()
+            print("Instanciado route")
+            router.create_route_table()
+            print("Creada route table")
+            router.load_route(parameters)
+            print("Cargada ruta")
+            router.close_connection()

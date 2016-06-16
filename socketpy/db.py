@@ -8,10 +8,15 @@ class Database:
         self.conn = sqlite3.connect(self.database)
         self.cursor = self.conn.cursor()
 
-    def create_db(self):
-        self.cursor.execute("""CREATE TABLE IF NOT EXISTS types (type_id INTEGER PRIMARY KEY,
+    def create_types_table(self):
+        self.execute_query("""CREATE TABLE IF NOT EXISTS types (type_id INTEGER PRIMARY KEY,
                                 type_name VARCHAR(50),
                                 type_source VARCHAR(50))""")
+        self.conn.commit()
+
+    def create_routes_table(self):
+        self.execute_query("""CREATE TABLE IF NOT EXISTS routes (route_id INTEGER PRIMARY KEY,
+                                route VARCHAR(100))""")
         self.conn.commit()
 
     def execute_query(self, query):
@@ -33,6 +38,15 @@ class Database:
         else:
             print("\tEl tipo de dato ya estaba en la base")
 
+    def insert_route(self, route):
+        print("Ruta ", route)
+        if not self._validate_route(route):
+            self.cursor.execute("INSERT INTO routes VALUES(NULL,?)", (route, ))
+            print("\tInsertada ruta: ", route)
+            self.conn.commit()
+        else:
+            print("\tLa ruta ya estaba en la base")
+
     def insert_types(self, types):
         if not self._validate_types(types):
             self.cursor.executemany("INSERT INTO types VALUES(NULL,?,?)", types)
@@ -47,9 +61,13 @@ class Database:
         self.cursor.close()
         self.conn.close()
 
+    #   Private Methods #
+
     def _validate_type(self, tipo):
-        c_built_ins = self._get_types()
-        return tipo in c_built_ins
+        return tipo in self._get_types()
+
+    def _validate_route(self, route):
+        return route in self._get_routes()
 
     def _validate_types(self, types):
         type_names = list(map(lambda tup: tup[0], types))
@@ -61,3 +79,7 @@ class Database:
     def _get_types(self):
         return list(map(lambda tup: tup[0], self.cursor.execute(
                     "SELECT type_name FROM types ORDER BY type_id")))
+
+    def _get_routes(self):
+        return list(map(lambda tup: tup[0], self.cursor.execute(
+            "SELECT route FROM routes ORDER BY route_id")))
