@@ -22,4 +22,4 @@ class RouteError(CommandError):
     pass
 
 
-SOCKETPY_ERRORS = [ParseError, CommandError, CreateError, RouteError, FileError]
+SOCKETPY_ERRORS = [ParseError, HelpError, CommandError, CreateError, RouteError, FileError]
