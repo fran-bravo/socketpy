@@ -76,7 +76,7 @@ class CreateCommand(Command):
             raise CreateError(exc)
 
     def _create_model(self, *args):
-        print("Escribiendo estructuras y funcoines asociadas al modelo")
+        print("Escribiendo estructuras y funciones asociadas al modelo")
         model = self.filer.write_model(*args)
         print("Insertando modelo en base de datos")
         self.db.insert_type(model, "modelos.h")

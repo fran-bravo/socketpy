@@ -56,8 +56,8 @@ class Parser:
             if type(exc) in SOCKETPY_ERRORS:
                 raise ParseError(exc)
             else:
-                msg = ['Unknown command "%s"' % command]
-                raise CommandError(' - '.join(msg))
+                #msg = ['Unknown command "%s"' % command]
+                raise CommandError(exc)
 
     def msg_format_commands(self):
         comandos = self._get_commands()
