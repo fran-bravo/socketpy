@@ -44,7 +44,7 @@ class Parser:
     def parse(self, *args):
         if len(args[0]) == 0:
             msg = ["¿Te olvidaste el comando? Los comandos son: "]
-            msg.append(self._msg_format_commands())
+            msg.append(self.msg_format_commands())
             raise CommandError(' - '.join(msg))
         else:
             parameters = list(args)[0]
@@ -59,12 +59,12 @@ class Parser:
                 msg = ['Unknown command "%s"' % command]
                 raise CommandError(' - '.join(msg))
 
-    # Private Methods
-
-    def _msg_format_commands(self):
+    def msg_format_commands(self):
         comandos = self._get_commands()
         msg = ", ".join(comandos)
         return msg
+
+    # Private Methods
 
     def _get_commands(self):
         comandos = list(self.commands.keys())

@@ -10,6 +10,10 @@ class CreateError(CommandError):
     pass
 
 
+class HelpError(CommandError):
+    pass
+
+
 class FileError(CreateError):
     pass
 
