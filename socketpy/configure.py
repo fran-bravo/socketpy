@@ -15,8 +15,10 @@ class Configure:
     def initialize_directories(self):
         self._create_directory("database")
         self._create_directory("headers")
+        print("\tGenerados directorios database y headers")
 
     def create_db(self):
+        print("\tInicializando db")
         self.database.create_types_table()
         self._load_basic_types()
 
@@ -27,6 +29,7 @@ class Configure:
         self._create_models()
         self._create_packagesh()
         self._create_packagesc()
+        print("\tGenerados templates de sources a utilizar")
         return
 
     def gather_types(self):

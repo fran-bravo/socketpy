@@ -13,11 +13,13 @@ class Database:
                                 type_name VARCHAR(50),
                                 type_source VARCHAR(50))""")
         self.conn.commit()
+        print("\tCreada tabla de tipos")
 
     def create_routes_table(self):
         self.execute_query("""CREATE TABLE IF NOT EXISTS routes (route_id INTEGER PRIMARY KEY,
                                 route VARCHAR(100))""")
         self.conn.commit()
+        print("\tCreada tabla de rutas")
 
     def execute_query(self, query):
         return self.cursor.execute(query)
