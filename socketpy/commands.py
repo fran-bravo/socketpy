@@ -1,4 +1,7 @@
 import sqlite3
+
+from py._code.code import Code
+
 from socketpy.excpetions import CreateError, FileError, RouteError, HelpError
 from socketpy.filing import Filer
 from socketpy.configure import Configure
@@ -172,3 +175,11 @@ class RouteCommand(Command):
         msg = "El comando route agrega una ruta en la que socketpy debe explorar para hallar archivos "
         msg += "sources que se utilizan en los #includes\n"
         return msg
+
+
+class DeconfigCommand(Command):
+
+    def do_execute(self, parser, *args):
+        db = Database()
+        db.destroy_database()
+

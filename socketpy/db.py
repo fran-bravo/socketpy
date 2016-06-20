@@ -89,3 +89,8 @@ class Database:
     def get_routes(self):
         return list(map(lambda tup: tup[0], self.cursor.execute(
             "SELECT route FROM routes ORDER BY route_id")))
+
+    def destroy_database(self):
+        self.close_connection()
+        os.remove(self.database)
+        return
