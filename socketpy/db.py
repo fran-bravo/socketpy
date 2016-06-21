@@ -8,18 +8,10 @@ class Database:
         self.conn = sqlite3.connect(self.database)
         self.cursor = self.conn.cursor()
 
-    def create_types_table(self):
-        self.execute_query("""CREATE TABLE IF NOT EXISTS types (type_id INTEGER PRIMARY KEY,
-                                type_name VARCHAR(50),
-                                type_source VARCHAR(50))""")
-        self.conn.commit()
-        print("\tCreada tabla de tipos")
-
-    def create_routes_table(self):
-        self.execute_query("""CREATE TABLE IF NOT EXISTS routes (route_id INTEGER PRIMARY KEY,
-                                route VARCHAR(100))""")
-        self.conn.commit()
-        print("\tCreada tabla de rutas")
+    def create_tables(self):
+        print("Creando tablas")
+        self._create_types_table()
+        self._create_routes_table()
 
     def execute_query(self, query):
         return self.cursor.execute(query)
@@ -67,6 +59,24 @@ class Database:
         self.cursor.close()
         self.conn.close()
 
+    def get_types(self):
+        return list(map(lambda tup: tup[0], self.cursor.execute(
+                    "SELECT type_name FROM types ORDER BY type_id")))
+
+    def get_routes(self):
+        return list(map(lambda tup: tup[0], self.cursor.execute(
+            "SELECT route FROM routes ORDER BY route_id")))
+
+    def destroy_database(self):
+        self.close_connection()
+        os.remove(self.database)
+        return
+
+    def destroy_tables(self):
+        print("Destruyendo tablas")
+        self._destroy_table("types")
+        self._destroy_table("routes")
+
     #   Private Methods #
 
     def _validate_type(self, tipo):
@@ -82,15 +92,19 @@ class Database:
             not_in_db = not_in_db and self._validate_type(type)
         return not_in_db
 
-    def get_types(self):
-        return list(map(lambda tup: tup[0], self.cursor.execute(
-                    "SELECT type_name FROM types ORDER BY type_id")))
+    def _destroy_table(self, tabla):
+        self.execute_query("""DROP TABLE IF EXISTS %s;""" % tabla)
+        self.conn.commit()
+        print("\tTabla %s destruida" % tabla)
 
-    def get_routes(self):
-        return list(map(lambda tup: tup[0], self.cursor.execute(
-            "SELECT route FROM routes ORDER BY route_id")))
+    def _create_types_table(self):
+        self.execute_query("""CREATE TABLE IF NOT EXISTS types (type_id INTEGER PRIMARY KEY,
+            type_name VARCHAR(50),
+            type_source VARCHAR(50))""")
+        print("\tCreada tabla de tipos")
 
-    def destroy_database(self):
-        self.close_connection()
-        os.remove(self.database)
-        return
+    def _create_routes_table(self):
+        self.execute_query("""CREATE TABLE IF NOT EXISTS routes (route_id INTEGER PRIMARY KEY,
+                                route VARCHAR(100))""")
+        self.conn.commit()
+        print("\tCreada tabla de rutas")

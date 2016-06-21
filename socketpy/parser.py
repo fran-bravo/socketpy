@@ -1,5 +1,6 @@
 from socketpy.excpetions import CommandError, ParseError, SOCKETPY_ERRORS
-from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand, DeleteCommand, RouteCommand, DeconfigCommand
+from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand, \
+                              DeleteCommand, RouteCommand, DeconfigCommand, ResetCommand
 
 
 class Parser:
@@ -8,10 +9,10 @@ class Parser:
         self.commands = {'help': self.parser_help, 'create': self.create,
                          'config': self.config, 'flush': self.flush,
                          'delete': self.delete, 'route': self.route,
-                         'deconfig': self.deconfig}
+                         'deconfig': self.deconfig, 'reset': self.reset}
         self.helpers = {'help': [], 'create': ['model', 'socket'], 'config': [],
                         'flush': ['types', 'routes'], 'delete': [], 'route': [],
-                        'deconfig': []}
+                        'deconfig': [], 'reset': []}
 
     # Public Interface
 
@@ -41,6 +42,10 @@ class Parser:
         DeconfigCommand().do_execute(self, *args)
         return "deconfig"
 
+    def reset(self, *args):
+        ResetCommand().do_execute(self, *args)
+        return "reset"
+
     def flush(self, *args):
         FlushCommand().do_execute(self, *args)
         return "flush"
@@ -62,7 +67,7 @@ class Parser:
             if type(exc) in SOCKETPY_ERRORS:
                 raise ParseError(exc)
             else:
-                #msg = ['Unknown command "%s"' % command]
+                # msg = ['Unknown command "%s"' % command]
                 raise CommandError(exc)
 
     def msg_format_commands(self):

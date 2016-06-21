@@ -12,7 +12,7 @@ class Route:
     # Public Interface #
 
     def create_route_table(self):
-        self.database.create_routes_table()
+        self.database._create_routes_table()
 
     def load_route(self, directorios):
         route = os.sep.join(directorios)

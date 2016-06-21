@@ -19,7 +19,7 @@ class Configure:
 
     def create_db(self):
         print("\tInicializando db")
-        self.database.create_types_table()
+        self.database.create_tables()
         self._load_basic_types()
 
     def close_connection(self):

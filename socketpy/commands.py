@@ -167,7 +167,6 @@ class RouteCommand(Command):
         else:
             parameters = list(args)[0]
             router = Route()
-            router.create_route_table()
             router.load_route(parameters)
             router.close_connection()
 
@@ -182,4 +181,23 @@ class DeconfigCommand(Command):
     def do_execute(self, parser, *args):
         db = Database()
         db.destroy_database()
+        db.close_connection()
 
+    def __str__(self):
+        msg = "El comando deconfig elimina la base da datos que utiliza socketpy "
+        msg += "(Existente por motivos de manejo entre versiones)\n"
+        return msg
+
+
+class ResetCommand(Command):
+
+    def do_execute(self, parser, *args):
+        db = Database()
+        db.destroy_tables()
+        db.create_tables()
+        db.close_connection()
+
+    def __str__(self):
+        msg = "El comando reset reestablece la base de datos a su estado inicial "
+        msg += "(Existente por motivos de facilidad de comprensión)\n"
+        return msg
