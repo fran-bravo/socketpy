@@ -6,8 +6,12 @@ import pytest
 class TestParser(TestCase):
     parser = Parser()
 
+    def test_parse_command_help_wrong(self):
+        with pytest.raises(ParseError):
+            result = self.parser.parse(["help", "test"])
+
     def test_parse_command_help(self):
-        result = self.parser.parse(["help", "test"])
+        result = self.parser.parse(["help", "help"])
         assert result == "help"
 
     def test_parse_command_create(self):

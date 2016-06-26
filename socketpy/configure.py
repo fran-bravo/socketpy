@@ -39,38 +39,50 @@ class Configure:
             for fd in files:
                 if fd.endswith(".c") or fd.endswith(".h"):
                     self._analyze_file(root, fd)
-                    print("\tNo hay más tipos de dato en el archivo\n")
+                    print("\n\tNo hay más tipos de dato en el archivo\n")
 
     # Private Methods #
 
     def _analyze_file(self, root, source):
-        print("Raiz ", root)
         file = os.path.join(root, source)
         print("Procesando archivo: ", source)
-        struct_body = False
         fd = FileLineWrapper(open(file))
+        self._explore_lines(fd, source)
+
+    # Lines processing #
+
+    def _explore_lines(self, fd, source):
+        struct_body = False
         for line in fd.f:
-            if line.startswith("#include"):
+            if line.startswith("#include"):     # Linea #include
                 self._inspect_include(line)
-            if line.startswith("typedef") and line.endswith("{"):
+            if line.startswith("typedef") and line.endswith("{"):   # Linea typedef compuesta
                 struct_body = not struct_body
-            if line.startswith("typedef") and line.endswith(";\n"):
-                linea = line.split(" ")
-                linea.remove("typedef")
-                tipo = linea[-1]
-                tipo = re.sub('[;\n]', '', tipo)
-                print(tipo)
-                self.database.insert_type(tipo, source)
-            if line.startswith("}"):
+            if line.startswith("typedef") and line.endswith(";\n"):     # Linea typedef simple
+                self._get_type_from_typedef_sentence(line, source)
+            if line.startswith("}"):    # Fin typedef compuesta
                 struct_body = not struct_body
-                tipo = re.sub('[;}\ \n]', '', line)
-                if tipo.startswith("__"):
-                    tipo = tipo.split("))")[1]
-                if tipo != "":
-                    self.database.insert_type(tipo, source)
+                self._get_type_from_typedef_end_sentence(line, source)
+
+    # Line Analyzing #
+
+    def _get_type_from_typedef_end_sentence(self, line, source):
+        # TODO: Separar en diferentes analizadores de linea (punteros a funciones, structs, etc)
+        tipo = re.sub('[;}\ \n]', '', line)
+        if tipo.startswith("__"):
+            tipo = tipo.split("))")[1]
+        if tipo != "":
+            self.database.insert_type(tipo, source)
+
+    def _get_type_from_typedef_sentence(self, line, source):
+        linea = line.split(" ")
+        linea.remove("typedef")
+        tipo = linea[-1]
+        tipo = re.sub('[;\n]', '', tipo)
+        self.database.insert_type(tipo, source)
 
     def _inspect_include(self, line):
-        print("Inspecting include ", line)
+        print("\tExplorando include ", line)
         if "<" in line:
             file = line.split("<")[-1]
             file = re.sub('[>\n]', '', file)
@@ -80,8 +92,12 @@ class Configure:
             for dir, subdirs, files in os.walk(root):
                 if file in files:
                     self._analyze_file(dir, file)
-                    print("\tNo hay más tipos de dato en el archivo\n")
+                    print("\n\tNo hay más tipos de dato en el archivo\n")
                     break
+                else:
+                    print("\tEl archivo incluido no se encuentra en las rutas definidas\n")
+
+    # Db initialization #
 
     def _load_basic_types(self):
         types = [("int", "builtin"), ("uint8_t", "builtin"),
@@ -92,6 +108,8 @@ class Configure:
                  ("void*", "builtin"), ("char*", "builtin"),
                  ]
         self.database.insert_types(types)
+
+    # Directories initialization #
 
     @staticmethod
     def _create_directory(directory):

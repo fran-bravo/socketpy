@@ -25,7 +25,7 @@ class Analyzer:
     def _validate_source(self, tipo):
         self.source_type = True
         self._get_source(tipo)
-        return self.source_type
+        return self.source_type or self._match_array(tipo, self.c_array_types)
 
     def _validate_built_in(self, tipo):
         self.source_type = False
@@ -42,7 +42,9 @@ class Analyzer:
     def _get_source(self, tipo):
         db = Database()
         query = "SELECT type_source FROM types WHERE type_name = '" + tipo + "' ORDER BY type_id"
-        self.source_file = list(db.execute_query(query))[0][0]
+        self.source_file = list(db.execute_query(query))
+        if self.source_file:    # Validacion por si la query no encontro valores
+            self.source_file = self.source_file[0][0]
         db.close_connection()
 
     def _get_types(self):
@@ -52,4 +54,3 @@ class Analyzer:
         self.c_types = list(map(lambda tup: tup[0], db.select_types()))
         self.c_array_types = r'^[' + '|'.join(self.c_types) + ']'
         db.close_connection()
-

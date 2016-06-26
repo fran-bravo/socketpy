@@ -30,7 +30,7 @@ class Database:
             print("\tInsertado tipo de dato: ", tipo + "*")
             self.conn.commit()
         else:
-            print("\tEl tipo de dato ya estaba en la base")
+            print("\tEl tipo de dato: %s ya estaba en la base" % tipo)
 
     def insert_route(self, route):
         if not self._validate_route(route):
@@ -69,7 +69,9 @@ class Database:
 
     def destroy_database(self):
         self.close_connection()
+        print("\tDesconectada base de datos")
         os.remove(self.database)
+        print("\tEliminada base de datos")
         return
 
     def destroy_tables(self):
