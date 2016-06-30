@@ -1,8 +1,4 @@
-import sqlite3
-
-from py._code.code import Code
-
-from socketpy.excpetions import CreateError, FileError, RouteError, HelpError
+from socketpy.excpetions import CreateError, FileError, RouteError, HelpError, FlushError, EmbedError
 from socketpy.filing import Filer
 from socketpy.configure import Configure
 from socketpy.db import Database
@@ -31,7 +27,9 @@ class HelpCommand(Command):
     def __init__(self):
         self.commands = {'help': self, 'create': CreateCommand(),
                          'config': ConfigCommand(), 'flush': FlushCommand(),
-                         'delete': DeleteCommand(), 'route': RouteCommand()}
+                         'delete': DeleteCommand(), 'route': RouteCommand(),
+                         'deconfig': DeconfigCommand(), 'reset': ResetCommand(),
+                         'embed': EmbedCommand()}
 
     def do_execute(self, parser, *args):
         msg = ""
@@ -121,7 +119,7 @@ class FlushCommand(Command):
             msg += "Las opciones para el comando flush son: -"
             for opcion in parser.helpers["flush"]:
                 msg += opcion + " "
-            raise CreateError(msg)
+            raise FlushError(msg)
         else:
             parameters = list(args)[0]
             tipo = parameters.pop(0)
@@ -135,7 +133,7 @@ class FlushCommand(Command):
                 db.flush_routes()
                 db.close_connection()
         except FileError as exc:
-            raise CreateError(exc)
+            raise FlushError(exc)
 
     def __str__(self):
         msg = "El comando flush elimina información particular de proyectos en los que se utilizó socketpy "
@@ -200,4 +198,30 @@ class ResetCommand(Command):
     def __str__(self):
         msg = "El comando reset reestablece la base de datos a su estado inicial "
         msg += "(Existente por motivos de facilidad de comprensión)\n"
+        return msg
+
+
+class EmbedCommand(Command):
+
+    def do_execute(self, parser, *args):
+        if len(args[0]) == 0:
+            msg = "Faltan parametros\n"
+            msg += "Se necesita tener un parámetro que especifique el tipo de dato y " \
+                   "el archivo source al que pertenece"
+            raise EmbedError(msg)
+        else:
+            parameters = list(args)[0]
+            tipo = parameters.pop(0)
+            source = parameters.pop(0)
+        try:
+            db = Database()
+            db.insert_type(tipo, source)
+            db.close_connection()
+        except Exception as exc:
+            raise EmbedError(exc)
+
+    def __str__(self):
+        msg = "El comando embed permite insertar un tipo de dato especifico "
+        msg += "de forma manual y directa, con la finalidad de proveer un "
+        msg += "mecanismo para agregar tipos que no se han detectado durante la configuracion\n"
         return msg

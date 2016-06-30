@@ -67,7 +67,6 @@ class Configure:
     # Line Analyzing #
 
     def _get_type_from_typedef_end_sentence(self, line, source):
-        # TODO: Separar en diferentes analizadores de linea (punteros a funciones, structs, etc)
         tipo = re.sub('[;}\ \n]', '', line)
         if tipo.startswith("__"):
             tipo = tipo.split("))")[1]
@@ -75,10 +74,40 @@ class Configure:
             self.database.insert_type(tipo, source)
 
     def _get_type_from_typedef_sentence(self, line, source):
+        # TODO: Separar en diferentes analizadores de linea (punteros a funciones, structs, etc)
+        print("Linea typedef simple: ", line)   # typedef struct ptw32_cleanup_t ptw32_cleanup_t;
+
+        if re.match(r'(typedef) ([void|int|char]) (\()', line):
+            print("Es un puntero")
+            self._get_function_ptr(line, source)
+        elif re.match('typedef struct', line):
+            print("Es un struct")
+            self._get_struct(line, source)
+        elif re.match('typedef', line):
+            print("Es un tipo basico")
+            self._get_basic_type(line, source)
+
+    def _get_struct(self, line, source):
         linea = line.split(" ")
-        linea.remove("typedef")
         tipo = linea[-1]
-        tipo = re.sub('[;\n]', '', tipo)
+        tipo = re.sub('[\(\n;]', '', tipo)
+        self.database.insert_type(tipo, source)
+
+    def _get_function_ptr(self, line, source):
+        print("Puntero")
+        linea = line.split(" ")
+        tipo = linea[-1]
+        print("Linea: ", linea)
+        tipo = tipo.split(")")[0]
+        print("Tipo: ", tipo)
+        tipo = re.sub('[\(\n;]', '', tipo)
+        self.database.insert_type(tipo, source)
+
+    def _get_basic_type(self, line, source):
+        linea = line.split(" ")
+        tipo = linea[-1]
+        tipo = re.sub('[\(\n;]', '', tipo)
+        print("Tipo: ", tipo)
         self.database.insert_type(tipo, source)
 
     def _inspect_include(self, line):

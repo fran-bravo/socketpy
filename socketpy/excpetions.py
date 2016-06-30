@@ -22,4 +22,12 @@ class RouteError(CommandError):
     pass
 
 
-SOCKETPY_ERRORS = [ParseError, HelpError, CommandError, CreateError, RouteError, FileError]
+class FlushError(CommandError):
+    pass
+
+
+class EmbedError(CommandError):
+    pass
+
+
+SOCKETPY_ERRORS = [ParseError, HelpError, CommandError, CreateError, RouteError, FileError, FlushError, EmbedError]
