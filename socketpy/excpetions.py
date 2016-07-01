@@ -18,6 +18,10 @@ class FileError(CreateError):
     pass
 
 
+class ArgumentError(FileError):
+    pass
+
+
 class RouteError(CommandError):
     pass
 
@@ -30,4 +34,4 @@ class EmbedError(CommandError):
     pass
 
 
-SOCKETPY_ERRORS = [ParseError, HelpError, CommandError, CreateError, RouteError, FileError, FlushError, EmbedError]
+SOCKETPY_ERRORS = [ParseError, HelpError, CommandError, CreateError, RouteError, FileError, ArgumentError, FlushError, EmbedError]

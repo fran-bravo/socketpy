@@ -1,7 +1,7 @@
 import os
 from shutil import rmtree, copytree
 from .analyzer import Analyzer
-from socketpy.excpetions import FileError
+from socketpy.excpetions import FileError, ArgumentError
 
 
 class FileLineWrapper(object):
@@ -202,5 +202,8 @@ class Filer:
     # Auxiliary
 
     def _split_selector(self, string):
-        tipo, selector = string.split(":")
+        if len(list(string.split(":"))) == 2:
+            tipo, selector = string.split(":")
+        else:
+            raise ArgumentError("El formato de los argumentos ingresados es incorrecto. El formato es tipo:nombre")
         return tipo, selector
