@@ -211,6 +211,7 @@ class EmbedCommand(Command):
             raise EmbedError(msg)
         else:
             parameters = list(args)[0]
+            print(parameters)
             tipo = parameters.pop(0)
             source = parameters.pop(0)
         try:
@@ -224,4 +225,6 @@ class EmbedCommand(Command):
         msg = "El comando embed permite insertar un tipo de dato especifico "
         msg += "de forma manual y directa, con la finalidad de proveer un "
         msg += "mecanismo para agregar tipos que no se han detectado durante la configuracion\n"
+        msg += "El formato para agregar tipos es [nombre_tipo] [archivo_source].\n"
+        msg +="Ejemplo: socketpy embed t_log log.h\n"
         return msg

@@ -5,6 +5,8 @@ class Database:
 
     def __init__(self):
         self.database = os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database"), "types.db")
+        if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database")):
+            os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database"))
         self.conn = sqlite3.connect(self.database)
         self.cursor = self.conn.cursor()
 
