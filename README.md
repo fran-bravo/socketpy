@@ -1,4 +1,6 @@
 # socketpy
+[![Build Status](https://travis-ci.com/fran-bravo/socketpy.svg?token=xiwZKBqBy5Nsagz6fEGD&branch=master)](https://travis-ci.com/fran-bravo/socketpy)
+
 TODO: Write a project description
 ## Installation
 To install this package, first you need to have python 3 or higher in your operating system.
