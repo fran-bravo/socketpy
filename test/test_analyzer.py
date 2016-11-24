@@ -1,7 +1,10 @@
 from unittest import TestCase
 from socketpy.analyzer import Analyzer
+from socketpy.configure import Configure
 import pytest
 
+configure = Configure()
+configure.create_db()
 
 class TestAnalyzer(TestCase):
     analyzer = Analyzer()
