@@ -52,17 +52,21 @@ class Configure:
     # Lines processing #
 
     def _explore_lines(self, fd, source):
-        struct_body = False
+        struct_body = 0
         for line in fd.f:
             if line.startswith("#include"):     # Linea #include
                 self._inspect_include(line)
-            if line.startswith("typedef") and line.endswith("{"):   # Linea typedef compuesta
-                struct_body = not struct_body
-            if line.startswith("typedef") and line.endswith(";\n"):     # Linea typedef simple
+            elif line.startswith("typedef") and line.endswith(";\n"):     # Linea typedef simple
                 self._get_type_from_typedef_sentence(line, source)
-            if line.startswith("}"):    # Fin typedef compuesta
-                struct_body = not struct_body
-                self._get_type_from_typedef_end_sentence(line, source)
+            elif line.startswith("typedef") and (line.endswith("{") or line.endswith("\n")):   # Linea typedef compuesta
+                struct_body += 1
+            elif line.endswith("{\n"):
+                struct_body += 1
+            elif line.startswith("}"):    # Fin typedef compuesta
+                struct_body -= 1
+                if struct_body == 0:
+                    self._get_type_from_typedef_end_sentence(line, source)
+
 
     # Line Analyzing #
 
@@ -77,7 +81,7 @@ class Configure:
         # TODO: Separar en diferentes analizadores de linea (punteros a funciones, structs, etc)
         print("Linea typedef simple: ", line)   # typedef struct ptw32_cleanup_t ptw32_cleanup_t;
 
-        if re.match(r'(typedef) ([void|int|char]) (\()', line):
+        if re.match(r'(typedef) (void|int|char) (\()', line):
             print("Es un puntero")
             self._get_function_ptr(line, source)
         elif re.match('typedef struct', line):
@@ -94,17 +98,16 @@ class Configure:
         self.database.insert_type(tipo, source)
 
     def _get_function_ptr(self, line, source):
-        print("Puntero")
         linea = line.split(" ")
-        tipo = linea[-1]
-        print("Linea: ", linea)
+        tipo = linea[2]
         tipo = tipo.split(")")[0]
         print("Tipo: ", tipo)
-        tipo = re.sub('[\(\n;]', '', tipo)
+        tipo = re.sub('[\(\*\n;]', '', tipo)
         self.database.insert_type(tipo, source)
 
     def _get_basic_type(self, line, source):
-        linea = line.split(" ")
+        linea = line.replace("\t", " ")
+        linea = linea.split(" ")
         tipo = linea[-1]
         tipo = re.sub('[\(\n;]', '', tipo)
         print("Tipo: ", tipo)
@@ -115,6 +118,9 @@ class Configure:
         if "<" in line:
             file = line.split("<")[-1]
             file = re.sub('[>\n]', '', file)
+            #TODO:  if "/" in file:
+            #           file = file.split("/")[-1]
+            print("Archivo {}".format(file))
         if "\"" in line:
             file = line.split("\"")[-2]
         for root in self.database.get_routes():

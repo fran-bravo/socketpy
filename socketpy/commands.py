@@ -1,4 +1,4 @@
-from socketpy.excpetions import CreateError, FileError, RouteError, HelpError, FlushError, EmbedError
+from socketpy.exceptions import CreateError, FileError, RouteError, HelpError, FlushError, EmbedError
 from socketpy.filing import Filer
 from socketpy.configure import Configure
 from socketpy.db import Database

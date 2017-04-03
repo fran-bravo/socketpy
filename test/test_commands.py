@@ -1,6 +1,6 @@
 from unittest import TestCase
 from socketpy.parser import Parser
-from socketpy.excpetions import ParseError
+from socketpy.exceptions import ParseError
 import pytest, sys, io, os
 
 

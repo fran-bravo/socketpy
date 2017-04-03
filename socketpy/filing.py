@@ -1,7 +1,7 @@
 import os
 from shutil import rmtree, copytree
 from .analyzer import Analyzer
-from socketpy.excpetions import FileError, ArgumentError
+from socketpy.exceptions import FileError, ArgumentError
 
 
 class FileLineWrapper(object):
@@ -149,7 +149,7 @@ class Filer:
 
     def _process_arguments(self, parameters):
         for par in parameters:
-            tipo, selector = self._split_selector(par)
+            selector, tipo = self._split_selector(par)
             if self.analyzer.analyze_type(tipo):
                 self.attributes[selector] = tipo
                 if self.analyzer.source_type:

@@ -1,4 +1,4 @@
-from socketpy.excpetions import CommandError, ParseError, SOCKETPY_ERRORS
+from socketpy.exceptions import CommandError, ParseError, SOCKETPY_ERRORS
 from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand, \
                               DeleteCommand, RouteCommand, DeconfigCommand, ResetCommand, \
                               EmbedCommand
