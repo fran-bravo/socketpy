@@ -3,6 +3,8 @@ from shutil import rmtree, copytree
 from .analyzer import Analyzer
 from socketpy.exceptions import FileError, ArgumentError
 
+PACK_BODY = "{\n\t//TODO: definir funcion\n}\n"
+
 
 class FileLineWrapper(object):
     def __init__(self, f):
@@ -26,6 +28,8 @@ class Filer:
         self.defined_struct = ""
         self.number_struct = 0
         self.package = ""
+        self.package_functions = ""
+        self.unpackage_functions = ""
         self.lines = ""
         self.includes = ""
         self.update = False
@@ -40,8 +44,10 @@ class Filer:
         self._process_input(parameters, struct)
         # self.examine_context()
         self._write_model()
-        self._read_package_file(struct)
-        self._write_package()
+        self._read_package_c_file(struct)
+        self._write_package_c()
+        self._read_package_h_file(struct)
+        self._write_package_h()
         return struct
 
     def examine_context(self):
@@ -78,11 +84,13 @@ class Filer:
         self._inspect_old_struct(struct, fd)
         return
 
-    def _read_package_file(self, struct):
+    def _read_package_c_file(self, struct):
         print("\tLeyendo archivos de paquetes")
-        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
-        fd = FileLineWrapper(open(path, "r"))
-        self._inspect_old_package(struct, fd)
+        self._read_file(struct, "paquetes.c")
+        return
+
+    def _read_package_h_file(self, struct):
+        self._read_file(struct, "paquetes.h")
         return
 
     # Inner Processing #
@@ -134,9 +142,21 @@ class Filer:
         self.lines = header + self.includes + self.defined_struct + self.struct + "#endif\n" + footer
         return
 
-    def _prepare_package_lines(self):
+    def _prepare_package_c_lines(self):
         header, middle, footer = self.lines.split("} //Fin del switch\n")
-        self.lines = header + self.package + "\t} //Fin del switch\n" + middle + self.package + "\t} //Fin del switch\n" + footer
+        self.lines = header + self.package + "\t} //Fin del switch\n" + middle + self.package + \
+                                             "\t} //Fin del switch\n" + footer
+        header, middle, footer = self.lines.split("// Auxiliar\n")
+        self.lines = header + "// Auxiliar\n" + middle + self.package_functions + PACK_BODY + \
+                              "// Auxiliar\n" + self.unpackage_functions + PACK_BODY + footer
+        return
+
+    def _prepare_package_h_lines(self):
+        print("Lineas {}".format(self.lines))
+        header, footer = self.lines.split("// Auxiliar\n")
+        print("ASD")
+        self.lines = header + "// Auxiliar\n" + self.package_functions + ";\n" + \
+                              self.unpackage_functions + ";\n" + footer
         return
 
     def _process_input(self, parameters, struct):
@@ -145,6 +165,7 @@ class Filer:
         self._process_struct(struct)
         self._define_struct(struct)
         self._process_package(struct)
+        self._process_package_functions(struct)
         return
 
     def _process_arguments(self, parameters):
@@ -179,27 +200,48 @@ class Filer:
                        ":\n\t\t\t//TODO: definir funcion\n\t\t\tbreak;\n\t"
         return
 
+    def _process_package_functions(self, struct):
+        print("Procesando funciones")
+        self.package_functions = "t_stream* package_" + struct + "(" + struct + "* original_struct, " + \
+                                 "uint8_t struct_type)"
+
+        self.unpackage_functions = struct + "* unpackage_" + struct + "(char* data, uint16_t length)"
+
     # File Writing
 
     def _write_model(self):
         print("\tEscribiendo modelos")
         self._prepare_model_lines()
-        path = os.path.join(os.path.join(self.working_directory, "sockets"), "modelos.h")
-        fd = FileLineWrapper(open(path, "w"))
-        fd.f.writelines(self.lines)
+        self._write_file("modelos.h")
         self.update = False
         self.lines = ""
         return
 
-    def _write_package(self):
+    def _write_package_c(self):
         print("\tEscribiendo paquetes")
-        self._prepare_package_lines()
-        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
-        fd = FileLineWrapper(open(path, "w"))
-        fd.f.writelines(self.lines)
+        self._prepare_package_c_lines()
+        self._write_file("paquetes.c")
+        self.lines = ""
+        return
+
+    def _write_package_h(self):
+        self._prepare_package_h_lines()
+        self._write_file("paquetes.h")
+        self.lines = ""
         return
 
     # Auxiliary
+
+    def _write_file(self, file):
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), file)
+        fd = FileLineWrapper(open(path, "w"))
+        fd.f.writelines(self.lines)
+        fd.f.close()
+
+    def _read_file(self, struct, file):
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), file)
+        fd = FileLineWrapper(open(path, "r"))
+        self._inspect_old_package(struct, fd)
 
     def _split_selector(self, string):
         if len(list(string.split(":"))) == 2:

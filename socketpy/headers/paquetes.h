@@ -23,5 +23,6 @@ t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos);
 
 t_header despaquetizarHeader(char * header);
 
+// Auxiliar
 
 #endif

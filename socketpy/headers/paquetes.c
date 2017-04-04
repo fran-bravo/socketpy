@@ -22,7 +22,7 @@ void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length
     return buffer;
 }
 
-                            // Headers
+// Headers
 
 
 char * crearDataConHeader(uint8_t tipoEstructura, int length){
@@ -59,5 +59,8 @@ t_header despaquetizarHeader(char * header){
     return estructuraHeader;
 }
 
+// Auxiliar
+
+// Auxiliar
 
 #endif
