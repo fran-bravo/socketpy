@@ -86,11 +86,15 @@ class Filer:
 
     def _read_package_c_file(self, struct):
         print("\tLeyendo archivos de paquetes")
-        self._read_file(struct, "paquetes.c")
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
+        fd = FileLineWrapper(open(path, "r"))
+        self._inspect_old_package_c(struct, fd)
         return
 
     def _read_package_h_file(self, struct):
-        self._read_file(struct, "paquetes.h")
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.h")
+        fd = FileLineWrapper(open(path, "r"))
+        self._inspect_old_package_h(struct, fd)
         return
 
     # Inner Processing #
@@ -111,19 +115,32 @@ class Filer:
                         self.lines += line
         return
 
-    def _inspect_old_package(self, struct, fd):  # Determina que lineas incluir de paquetes.c
+    def _inspect_old_package_c(self, struct, fd):  # Determina que lineas incluir de paquetes.c
         inside_switch_body = False
+        inside_function = False
         for line in fd.f:
             if line != "\n":  # Ignoro lineas en blanco
                 if inside_switch_body:  # Ignoro lineas del switch ya definido
                     if "break;" in line:  # Delimito el final del switch
                         inside_switch_body = not inside_switch_body
+                elif inside_function:
+                    if "}\n" == line:
+                        inside_function = not inside_function
                 else:
                     if struct.upper() in line:  # Encuentro switch ya definido
                         self.update = True
                         inside_switch_body = not inside_switch_body
+                    elif struct.lower() in line:    # Encuentro funcion de la struct
+                        inside_function = not inside_function
                     else:  # Lineas comunes
                         self.lines += line
+        return
+
+    def _inspect_old_package_h(self, struct, fd):
+        for line in fd.f:
+            if line != "\n":  # Ignoro lineas en blanco
+                if struct.lower() not in line:    # Lineas comunes
+                    self.lines += line
         return
 
     def _found_define_struct(self, line, struct):
@@ -152,9 +169,7 @@ class Filer:
         return
 
     def _prepare_package_h_lines(self):
-        print("Lineas {}".format(self.lines))
         header, footer = self.lines.split("// Auxiliar\n")
-        print("ASD")
         self.lines = header + "// Auxiliar\n" + self.package_functions + ";\n" + \
                               self.unpackage_functions + ";\n" + footer
         return
@@ -221,12 +236,14 @@ class Filer:
         print("\tEscribiendo paquetes")
         self._prepare_package_c_lines()
         self._write_file("paquetes.c")
+        self.update = False
         self.lines = ""
         return
 
     def _write_package_h(self):
         self._prepare_package_h_lines()
         self._write_file("paquetes.h")
+        self.update = False
         self.lines = ""
         return
 
@@ -237,11 +254,6 @@ class Filer:
         fd = FileLineWrapper(open(path, "w"))
         fd.f.writelines(self.lines)
         fd.f.close()
-
-    def _read_file(self, struct, file):
-        path = os.path.join(os.path.join(self.working_directory, "sockets"), file)
-        fd = FileLineWrapper(open(path, "r"))
-        self._inspect_old_package(struct, fd)
 
     def _split_selector(self, string):
         if len(list(string.split(":"))) == 2:
