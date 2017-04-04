@@ -75,6 +75,11 @@ class Filer:
             print("\tCopiados templates de sockets")
         return path
 
+    def _generate_templates(self):
+        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
+        path = os.path.join(self.working_directory, "sockets")
+        print("Path {}\tBasepath {}".format(path, base_path))
+
     # File Reading #
 
     def _read_model_file(self, struct):
