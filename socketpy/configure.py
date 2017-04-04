@@ -118,7 +118,7 @@ class Configure:
         if "<" in line:
             file = line.split("<")[-1]
             file = re.sub('[>\n]', '', file)
-            #TODO:  if "/" in file:
+            # TODO:  if "/" in file:
             #           file = file.split("/")[-1]
             print("Archivo {}".format(file))
         if "\"" in line:
