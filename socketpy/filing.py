@@ -19,6 +19,96 @@ class FileLineWrapper(object):
         return self.f.readline()
 
 
+class ModelFormatter(object):
+
+    def __init__(self, includes=None, defined_struct=None, struct=None):
+        self.file = "modelos.h"
+        self.includes = includes
+        self.defined_struct = defined_struct
+        self.struct = struct
+
+    def prepare_lines(self, lines):
+        header, footer = lines.split("#endif")
+        lines = header + self.includes + self.defined_struct + self.struct + "#endif\n" + footer
+        return lines
+
+    def inspect(self, struct, fd, filing):
+        inside_struct_body = False
+        for line in fd.f:
+            filing._count_defined_structs(line)
+            filing._found_define_struct(line, struct)
+            if line != "\n":  # Ignoro lineas en blanco
+                if inside_struct_body:  # Ignoro de la struct ya definida
+                    if struct in line:  # Delimito el final del typedef
+                        inside_struct_body = not inside_struct_body
+                else:
+                    if struct in line:  # Encuentro struct ya definida
+                        inside_struct_body = not inside_struct_body
+                    else:  # Lineas comunes
+                        filing.lines += line
+        return
+
+
+class PackCFormatter(object):
+
+    def __init__(self, package=None, package_functions=None, unpackage_functions=None):
+        self.file = "paquetes.c"
+        self.package = package
+        self.package_functions = package_functions
+        self.unpackage_functions = unpackage_functions
+
+    def prepare_lines(self, lines):
+        header, middle, footer = lines.split("} //Fin del switch\n")
+        lines = header + self.package + "\t} //Fin del switch\n" + middle + self.package + \
+                     "\t} //Fin del switch\n" + footer
+        header, middle, footer = lines.split("// Auxiliar\n")
+        lines = header + "// Auxiliar\n" + middle + self.package_functions + PACK_BODY + \
+                     "// Auxiliar\n" + self.unpackage_functions + PACK_BODY + footer
+        return lines
+
+    def inspect(self, struct, fd, filing):
+        inside_switch_body = False
+        inside_function = False
+        for line in fd.f:
+            if line != "\n":  # Ignoro lineas en blanco
+                if inside_switch_body:  # Ignoro lineas del switch ya definido
+                    if "break;" in line:  # Delimito el final del switch
+                        inside_switch_body = not inside_switch_body
+                elif inside_function:
+                    if "}\n" == line:
+                        inside_function = not inside_function
+                else:
+                    if struct.upper() in line:  # Encuentro switch ya definido
+                        filing.update = True
+                        inside_switch_body = not inside_switch_body
+                    elif struct.lower() in line:  # Encuentro funcion de la struct
+                        inside_function = not inside_function
+                    else:  # Lineas comunes
+                        filing.lines += line
+        return
+
+
+class PackHFormatter(object):
+
+    def __init__(self, package_functions=None, unpackage_functions=None):
+        self.file = "paquetes.h"
+        self.package_functions = package_functions
+        self.unpackage_functions = unpackage_functions
+
+    def prepare_lines(self, lines):
+        header, footer = lines.split("// Auxiliar\n")
+        lines = header + "// Auxiliar\n" + self.package_functions + ";\n" + \
+                              self.unpackage_functions + ";\n" + footer
+        return lines
+
+    def inspect(self, struct, fd, filing):
+        for line in fd.f:
+            if line != "\n":  # Ignoro lineas en blanco
+                if struct.lower() not in line:    # Lineas comunes
+                    filing.lines += line
+        return
+
+
 class Filer:
 
     def __init__(self):
@@ -40,14 +130,14 @@ class Filer:
     def write_model(self, *args):
         parameters = args[0]
         struct = parameters.pop(0)
-        self._read_model_file(struct)
+        self._read_file(struct, ModelFormatter())
         self._process_input(parameters, struct)
         # self.examine_context()
-        self._write_model()
-        self._read_package_c_file(struct)
-        self._write_package_c()
-        self._read_package_h_file(struct)
-        self._write_package_h()
+        self._write_with_format(ModelFormatter(self.includes, self.defined_struct, self.struct))
+        self._read_file(struct, PackCFormatter())
+        self._write_with_format(PackCFormatter(self.package, self.package_functions, self.unpackage_functions))
+        self._read_file(struct, PackHFormatter())
+        self._write_with_format(PackHFormatter(self.package_functions, self.unpackage_functions))
         return struct
 
     def examine_context(self):
@@ -82,71 +172,14 @@ class Filer:
 
     # File Reading #
 
-    def _read_model_file(self, struct):
-        print("\tLeyendo archivo de modelos")
-        path = os.path.join(os.path.join(self.working_directory, "sockets"), "modelos.h")
+    def _read_file(self, struct, formatter):
+        print("\tLeyendo archivo {}".format(formatter.file))
+        path = os.path.join(os.path.join(self.working_directory, "sockets"), formatter.file)
         fd = FileLineWrapper(open(path, "r"))
-        self._inspect_old_struct(struct, fd)
-        return
-
-    def _read_package_c_file(self, struct):
-        print("\tLeyendo archivos de paquetes")
-        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.c")
-        fd = FileLineWrapper(open(path, "r"))
-        self._inspect_old_package_c(struct, fd)
-        return
-
-    def _read_package_h_file(self, struct):
-        path = os.path.join(os.path.join(self.working_directory, "sockets"), "paquetes.h")
-        fd = FileLineWrapper(open(path, "r"))
-        self._inspect_old_package_h(struct, fd)
+        formatter.inspect(struct, fd, self)
         return
 
     # Inner Processing #
-
-    def _inspect_old_struct(self, struct, fd):  # Determina que lineas incluir de modelos.h
-        inside_struct_body = False
-        for line in fd.f:
-            self._count_defined_structs(line)
-            self._found_define_struct(line, struct)
-            if line != "\n":  # Ignoro lineas en blanco
-                if inside_struct_body:  # Ignoro de la struct ya definida
-                    if struct in line:  # Delimito el final del typedef
-                        inside_struct_body = not inside_struct_body
-                else:
-                    if struct in line:  # Encuentro struct ya definida
-                        inside_struct_body = not inside_struct_body
-                    else:  # Lineas comunes
-                        self.lines += line
-        return
-
-    def _inspect_old_package_c(self, struct, fd):  # Determina que lineas incluir de paquetes.c
-        inside_switch_body = False
-        inside_function = False
-        for line in fd.f:
-            if line != "\n":  # Ignoro lineas en blanco
-                if inside_switch_body:  # Ignoro lineas del switch ya definido
-                    if "break;" in line:  # Delimito el final del switch
-                        inside_switch_body = not inside_switch_body
-                elif inside_function:
-                    if "}\n" == line:
-                        inside_function = not inside_function
-                else:
-                    if struct.upper() in line:  # Encuentro switch ya definido
-                        self.update = True
-                        inside_switch_body = not inside_switch_body
-                    elif struct.lower() in line:    # Encuentro funcion de la struct
-                        inside_function = not inside_function
-                    else:  # Lineas comunes
-                        self.lines += line
-        return
-
-    def _inspect_old_package_h(self, struct, fd):
-        for line in fd.f:
-            if line != "\n":  # Ignoro lineas en blanco
-                if struct.lower() not in line:    # Lineas comunes
-                    self.lines += line
-        return
 
     def _found_define_struct(self, line, struct):
         if struct.upper() in line:
@@ -157,26 +190,6 @@ class Filer:
     def _count_defined_structs(self, line):
         if "#define D" in line:
             self.number_struct += 1
-        return
-
-    def _prepare_model_lines(self):
-        header, footer = self.lines.split("#endif")
-        self.lines = header + self.includes + self.defined_struct + self.struct + "#endif\n" + footer
-        return
-
-    def _prepare_package_c_lines(self):
-        header, middle, footer = self.lines.split("} //Fin del switch\n")
-        self.lines = header + self.package + "\t} //Fin del switch\n" + middle + self.package + \
-                                             "\t} //Fin del switch\n" + footer
-        header, middle, footer = self.lines.split("// Auxiliar\n")
-        self.lines = header + "// Auxiliar\n" + middle + self.package_functions + PACK_BODY + \
-                              "// Auxiliar\n" + self.unpackage_functions + PACK_BODY + footer
-        return
-
-    def _prepare_package_h_lines(self):
-        header, footer = self.lines.split("// Auxiliar\n")
-        self.lines = header + "// Auxiliar\n" + self.package_functions + ";\n" + \
-                              self.unpackage_functions + ";\n" + footer
         return
 
     def _process_input(self, parameters, struct):
@@ -229,25 +242,10 @@ class Filer:
 
     # File Writing
 
-    def _write_model(self):
-        print("\tEscribiendo modelos")
-        self._prepare_model_lines()
-        self._write_file("modelos.h")
-        self.update = False
-        self.lines = ""
-        return
-
-    def _write_package_c(self):
-        print("\tEscribiendo paquetes")
-        self._prepare_package_c_lines()
-        self._write_file("paquetes.c")
-        self.update = False
-        self.lines = ""
-        return
-
-    def _write_package_h(self):
-        self._prepare_package_h_lines()
-        self._write_file("paquetes.h")
+    def _write_with_format(self, formatter):
+        print("\tEscribiendo {}".format(formatter.file))
+        self.lines = formatter.prepare_lines(self.lines)
+        self._write_file(formatter.file)
         self.update = False
         self.lines = ""
         return
