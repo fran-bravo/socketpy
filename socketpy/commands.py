@@ -226,5 +226,5 @@ class EmbedCommand(Command):
         msg += "de forma manual y directa, con la finalidad de proveer un "
         msg += "mecanismo para agregar tipos que no se han detectado durante la configuracion\n"
         msg += "El formato para agregar tipos es [nombre_tipo] [archivo_source].\n"
-        msg +="Ejemplo: socketpy embed t_log log.h\n"
+        msg += "Ejemplo: socketpy embed t_log log.h\n"
         return msg
