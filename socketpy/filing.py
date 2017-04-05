@@ -133,11 +133,11 @@ class Filer:
         self._read_file(struct, ModelFormatter())
         self._process_input(parameters, struct)
         # self.examine_context()
-        self._write_with_format(ModelFormatter(self.includes, self.defined_struct, self.struct))
+        self._write_with_format(self._generate_model_formatter())
         self._read_file(struct, PackCFormatter())
-        self._write_with_format(PackCFormatter(self.package, self.package_functions, self.unpackage_functions))
+        self._write_with_format(self._generate_pack_c_formatter())
         self._read_file(struct, PackHFormatter())
-        self._write_with_format(PackHFormatter(self.package_functions, self.unpackage_functions))
+        self._write_with_format(self._generate_pack_h_formatter())
         return struct
 
     def examine_context(self):
@@ -249,6 +249,17 @@ class Filer:
         self.update = False
         self.lines = ""
         return
+
+    # Generate Formatters
+
+    def _generate_model_formatter(self):
+        return ModelFormatter(self.includes, self.defined_struct, self.struct)
+
+    def _generate_pack_c_formatter(self):
+        return PackCFormatter(self.package, self.package_functions, self.unpackage_functions)
+
+    def _generate_pack_h_formatter(self):
+        return PackHFormatter(self.package_functions, self.unpackage_functions)
 
     # Auxiliary
 
