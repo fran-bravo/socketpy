@@ -269,7 +269,8 @@ class Filer:
         fd.f.writelines(self.lines)
         fd.f.close()
 
-    def _split_selector(self, string):
+    @staticmethod
+    def _split_selector(string):
         if len(list(string.split(":"))) == 2:
             tipo, selector = string.split(":")
         else:

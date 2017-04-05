@@ -3,6 +3,123 @@ from socketpy.filing import FileLineWrapper
 from socketpy.db import Database
 
 
+MODEL = """#ifndef MODELOS_H_
+#define MODELOS_H_
+
+#include  <commons/collections/list.h>
+
+typedef struct {
+    int length;
+    char *data;
+} t_stream;
+
+// Header de stream
+typedef struct {
+    uint8_t tipoEstructura;
+    uint16_t length;
+} __attribute__ ((__packed__)) t_header;
+
+// Modelos
+
+
+
+#endif"""
+PACKC = """#include "paquetes.h"
+
+// Paquetizacion
+
+t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
+    t_stream * buffer;
+
+    switch(tipoEstructura){
+    } //Fin del switch
+
+    return buffer;
+}
+
+// Despaquetizacion
+
+void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length){
+    void * buffer;
+
+    switch(tipoEstructura){
+    } //Fin del switch
+
+    return buffer;
+}
+
+// Headers
+
+
+char * crearDataConHeader(uint8_t tipoEstructura, int length){
+    char * data = malloc(length);
+
+    uint16_t lengthDatos = length - sizeof(t_header);
+
+    t_header header = crearHeader(tipoEstructura, lengthDatos); //creo el header
+
+    int tamanoTotal = 0, tamanoDato = 0;
+
+    memcpy(data, &header.tipoEstructura, tamanoDato = sizeof(uint8_t)); //copio el tipoEstructura del header a data
+    tamanoTotal = tamanoDato;
+    memcpy(data + tamanoTotal, &header.length, tamanoDato = sizeof(uint16_t)); //copio el length del header a data
+
+    return data;
+}
+
+t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos){
+    t_header header;
+    header.tipoEstructura = tipoEstructura;
+    header.length = lengthDatos;
+    return header;
+}
+
+t_header despaquetizarHeader(char * header){
+    t_header estructuraHeader;
+
+    int tamanoTotal = 0, tamanoDato = 0;
+    memcpy(&estructuraHeader.tipoEstructura, header + tamanoTotal, tamanoDato = sizeof(uint8_t));
+    tamanoTotal = tamanoDato;
+    memcpy(&estructuraHeader.length, header + tamanoTotal, tamanoDato = sizeof(uint16_t));
+
+    return estructuraHeader;
+}
+
+// Auxiliar
+
+// Auxiliar
+
+#endif"""
+PACKH = """#ifndef PAQUETES_H_
+#define PAQUETES_H_
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdint.h>
+#include "string.h"
+#include "modelos.h"
+
+// Paquetizacion
+
+t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen);
+
+// Despaquetizacion
+
+void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length);
+
+// Headers
+
+char * crearDataConHeader(uint8_t tipoEstructura, int length);
+t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos);
+
+t_header despaquetizarHeader(char * header);
+
+// Auxiliar
+
+#endif"""
+
+
 class Configure:
 
     def __init__(self):
@@ -26,9 +143,9 @@ class Configure:
         self.database.close_connection()
 
     def create_headers(self):
-        self._create_models()
-        self._create_packagesh()
-        self._create_packagesc()
+        self._create_file("modelos.h", MODEL)
+        self._create_file("paquetes.h", PACKH)
+        self._create_file("paquetes.c", PACKC)
         print("\tGenerados templates de sources a utilizar")
         return
 
@@ -66,7 +183,6 @@ class Configure:
                 struct_body -= 1
                 if struct_body == 0:
                     self._get_type_from_typedef_end_sentence(line, source)
-
 
     # Line Analyzing #
 
@@ -153,135 +269,8 @@ class Configure:
 
     #   Templates Creation  #
 
-    def _create_models(self):
-        fd = FileLineWrapper(open(os.path.join(self.headers, "modelos.h"), "w+"))
-        fd.f.writelines("""#ifndef MODELOS_H_
-#define MODELOS_H_
-
-#include  <commons/collections/list.h>
-
-typedef struct {
-    int length;
-    char *data;
-} t_stream;
-
-// Header de stream
-typedef struct {
-    uint8_t tipoEstructura;
-    uint16_t length;
-} __attribute__ ((__packed__)) t_header;
-
-// Modelos
-
-
-
-#endif"""
-                        )
-        fd.close()
-        return
-
-    def _create_packagesh(self):
-        fd = FileLineWrapper(open(os.path.join(self.headers, "paquetes.h"), "w+"))
-        fd.f.writelines("""#ifndef PAQUETES_H_
-#define PAQUETES_H_
-
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdint.h>
-#include "string.h"
-#include "modelos.h"
-
-// Paquetizacion
-
-t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen);
-
-// Despaquetizacion
-
-void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length);
-
-// Headers
-
-char * crearDataConHeader(uint8_t tipoEstructura, int length);
-t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos);
-
-t_header despaquetizarHeader(char * header);
-
-// Auxiliar
-
-#endif"""
-                        )
-        fd.close()
-        return
-
-    def _create_packagesc(self):
-        fd = FileLineWrapper(open(os.path.join(self.headers,  "paquetes.c"), "w+"))
-        fd.f.writelines("""#include "paquetes.h"
-
-// Paquetizacion
-
-t_stream * paquetizar(int tipoEstructura, void * estructuraOrigen){
-    t_stream * buffer;
-
-    switch(tipoEstructura){
-    } //Fin del switch
-
-    return buffer;
-}
-
-// Despaquetizacion
-
-void * despaquetizar(uint8_t tipoEstructura, char * dataPaquete, uint16_t length){
-    void * buffer;
-
-    switch(tipoEstructura){
-    } //Fin del switch
-
-    return buffer;
-}
-
-// Headers
-
-
-char * crearDataConHeader(uint8_t tipoEstructura, int length){
-    char * data = malloc(length);
-
-    uint16_t lengthDatos = length - sizeof(t_header);
-
-    t_header header = crearHeader(tipoEstructura, lengthDatos); //creo el header
-
-    int tamanoTotal = 0, tamanoDato = 0;
-
-    memcpy(data, &header.tipoEstructura, tamanoDato = sizeof(uint8_t)); //copio el tipoEstructura del header a data
-    tamanoTotal = tamanoDato;
-    memcpy(data + tamanoTotal, &header.length, tamanoDato = sizeof(uint16_t)); //copio el length del header a data
-
-    return data;
-}
-
-t_header crearHeader(uint8_t tipoEstructura, uint16_t lengthDatos){
-    t_header header;
-    header.tipoEstructura = tipoEstructura;
-    header.length = lengthDatos;
-    return header;
-}
-
-t_header despaquetizarHeader(char * header){
-    t_header estructuraHeader;
-
-    int tamanoTotal = 0, tamanoDato = 0;
-    memcpy(&estructuraHeader.tipoEstructura, header + tamanoTotal, tamanoDato = sizeof(uint8_t));
-    tamanoTotal = tamanoDato;
-    memcpy(&estructuraHeader.length, header + tamanoTotal, tamanoDato = sizeof(uint16_t));
-
-    return estructuraHeader;
-}
-
-// Auxiliar
-
-// Auxiliar
-
-#endif"""
-                        )
+    def _create_file(self, file, lines):
+        fd = FileLineWrapper(open(os.path.join(self.headers, file), "w+"))
+        fd.f.writelines(lines)
         fd.close()
         return
