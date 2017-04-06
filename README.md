@@ -1,9 +1,12 @@
 # socketpy
 [![Build Status](https://travis-ci.com/fran-bravo/socketpy.svg?token=xiwZKBqBy5Nsagz6fEGD&branch=master)](https://travis-ci.com/fran-bravo/socketpy)
+[![Python Version](https://img.shields.io/badge/python-3.2%20%2B-blue.svg)](https://www.python.org/)
 
-TODO: Write a project description
+socketpy provides a CLI for the creation of basic models and packaging functions for data structures, used in sockets, in C.
+It's interface helps avoid common boilerplater code used for sending structs with sockets.
+
 ## Installation
-To install this package, first you need to have python 3 or higher in your operating system.
+To install this package, first you need to have python 3.2 or higher in your operating system.
 
 Check [Python](https://www.python.org/downloads/source/) for information about it's installation.
 
@@ -28,10 +31,3 @@ will take care of the installation of the package.
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
-
-## History
-TODO: Write history
-## Credits
-TODO: Write credits
-## License
-TODO: Write license
