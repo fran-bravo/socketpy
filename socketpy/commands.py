@@ -181,11 +181,14 @@ class DeconfigCommand(Command):
 
     def do_execute(self, parser, *args):
         db = Database()
+        filer = Filer()
         print("Eliminando configuracion")
         db.destroy_database()
+        filer.delete_sockets()
 
     def __str__(self):
-        msg = "El comando deconfig elimina la base da datos que utiliza socketpy "
+        msg = "El comando deconfig elimina la base de datos que utiliza socketpy "
+        msg += "y elimina la carpeta de sockets "
         msg += "(Existente por motivos de manejo entre versiones)\n"
         return msg
 
