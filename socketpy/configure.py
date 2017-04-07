@@ -126,6 +126,7 @@ class Configure:
         self.working_directory = os.getcwd()
         self.headers = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
         self.database = Database()
+        self.analyzed_files = []
 
     # Public Interface #
 
@@ -156,7 +157,7 @@ class Configure:
             for fd in files:
                 if fd.endswith(".c") or fd.endswith(".h"):
                     self._analyze_file(root, fd)
-                    print("\n\tNo hay más tipos de dato en el archivo\n")
+                    print("\tNo hay más tipos de datos en el archivo\n")
 
     # Private Methods #
 
@@ -171,6 +172,7 @@ class Configure:
     def _explore_lines(self, fd, source):
         struct_body = 0
         for line in fd.f:
+            line = line.lstrip()
             if line.startswith("#include"):     # Linea #include
                 self._inspect_include(line)
             elif line.startswith("typedef") and line.endswith(";\n"):     # Linea typedef simple
@@ -230,23 +232,27 @@ class Configure:
         self.database.insert_type(tipo, source)
 
     def _inspect_include(self, line):
-        print("\tExplorando include ", line)
+        print("Explorando include ", line)
         if "<" in line:
             file = line.split("<")[-1]
             file = re.sub('[>\n]', '', file)
-            # TODO:  if "/" in file:
-            #           file = file.split("/")[-1]
+            if "/" in file:
+                file = file.split("/")[-1]
             print("Archivo {}".format(file))
         if "\"" in line:
             file = line.split("\"")[-2]
         for root in self.database.get_routes():
             for dir, subdirs, files in os.walk(root):
-                if file in files:
+                if file in files and file not in self.analyzed_files:
                     self._analyze_file(dir, file)
-                    print("\n\tNo hay más tipos de dato en el archivo\n")
+                    print("\tNo hay más tipos de dato en el archivo")
+                    self.analyzed_files.append(file)
+                    break
+                elif file in self.analyzed_files:
+                    print("El archivo {} ya fue analizado".format(file))
                     break
                 else:
-                    print("\tEl archivo incluido no se encuentra en las rutas definidas\n")
+                    print("\tEl archivo incluido no se encuentra en las rutas definidas\n", end='')
 
     # Db initialization #
 

@@ -54,10 +54,12 @@ class HelpCommand(Command):
 class CreateCommand(Command):
 
     def __init__(self):
-        self.filer = Filer()
-        self.db = Database()
+        self.filer = None
+        self.db = None
 
     def do_execute(self, parser, *args):
+        self.filer = Filer()
+        self.db = Database()
         if len(args[0]) == 0:
             msg = "Faltan parametros\n"
             msg += print_helpers(parser, "create")
@@ -144,9 +146,10 @@ class FlushCommand(Command):
 class DeleteCommand(Command):
 
     def __init__(self):
-        self.filer = Filer()
+        self.filer = None
 
     def do_execute(self, parser, *args):
+        self.filer = Filer()
         self.filer.delete_sockets()
 
     def __str__(self):
