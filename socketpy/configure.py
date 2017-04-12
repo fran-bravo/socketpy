@@ -1,6 +1,7 @@
 import sqlite3, os, re, sys
 from socketpy.filing import FileLineWrapper
 from socketpy.db import Database
+from socketpy.analyzer import Analyzer
 
 
 MODEL = """#ifndef MODELOS_H_
@@ -196,10 +197,11 @@ class Configure:
             self.database.insert_type(tipo, source)
 
     def _get_type_from_typedef_sentence(self, line, source):
+        analyzer = Analyzer()
         # TODO: Separar en diferentes analizadores de linea (punteros a funciones, structs, etc)
         print("Linea typedef simple: ", line)   # typedef struct ptw32_cleanup_t ptw32_cleanup_t;
-
-        if re.match(r'(typedef) (void|int|char) (\()', line):
+        print(analyzer.all())
+        if re.match(r'(typedef) ' + analyzer.all() + ' (\()', line):
             print("Es un puntero")
             self._get_function_ptr(line, source)
         elif re.match('typedef struct', line):
@@ -236,8 +238,8 @@ class Configure:
         if "<" in line:
             file = line.split("<")[-1]
             file = re.sub('[>\n]', '', file)
-            if "/" in file:
-                file = file.split("/")[-1]
+            #if "/" in file:
+            #    file = file.split("/")[-1]
             print("Archivo {}".format(file))
         if "\"" in line:
             file = line.split("\"")[-2]
@@ -257,11 +259,11 @@ class Configure:
     # Db initialization #
 
     def _load_basic_types(self):
-        types = [("int", "builtin"), ("uint8_t", "builtin"),
-                 ("uint16_t", "builtin"), ("uint32_t", "builtin"),
+        types = [("int", "builtin"),
+                 ("float", "builtin"), ("double", "builtin"),
                  ("void", "builtin"), ("char", "builtin"),
-                 ("int*", "builtin"), ("uint8_t*", "builtin"),
-                 ("uint16_t*", "builtin"), ("uint32_t*", "builtin"),
+                 ("int*", "builtin"),
+                 ("float*", "builtin"), ("double*", "builtin"),
                  ("void*", "builtin"), ("char*", "builtin"),
                  ]
         self.database.insert_types(types)

@@ -212,7 +212,9 @@ class Filer:
                 raise TypeError('El tipo de dato: ' + tipo + ' no es un tipo valido')
 
     def _add_include(self):
+        print("Source {}".format(self.analyzer.source_file))
         if (self.analyzer.source_file not in self.lines) and (self.analyzer.source_file != "modelos.h"):
+            print("Meh")
             self.includes += "#include <" + self.analyzer.source_file + ">\n"
 
     def _define_struct(self, struct):
