@@ -59,6 +59,13 @@ class Parser:
     # Parse
 
     def parse(self, *args):
+        """
+        Parses the input from STDIN, obtains the command and calls it with the rest of the arguments
+        
+        :param args: Input received from STDIN 
+        :return: A message of the command executed or an error
+        """
+
         if len(args[0]) == 0:
             msg = ["¿Te olvidaste el comando? Los comandos son: "]
             msg.append(self.msg_format_commands())
@@ -77,6 +84,12 @@ class Parser:
                 raise CommandError(exc)
 
     def msg_format_commands(self):
+        """
+        Method that gets all the commands of the parser and formats it for a nice print
+        
+        :return: The commands of the parser formatted 
+        """
+
         comandos = self._get_commands()
         msg = ", ".join(comandos)
         return msg
@@ -84,6 +97,12 @@ class Parser:
     # Private Methods
 
     def _get_commands(self):
+        """
+        Method that gets all the commands of the parser and sorts them
+        
+        :return: List of Commands sorted 
+        """
+
         comandos = list(self.commands.keys())
         comandos.sort()
         return comandos

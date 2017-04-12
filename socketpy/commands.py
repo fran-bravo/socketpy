@@ -6,6 +6,13 @@ from socketpy.route import Route
 
 
 def print_helpers(parser, key):
+    """
+    Function that prints the helpers of a certain command
+    
+    :param parser: The parser which has all the helpers defined in a dict 
+    :param key: The command which helper is called
+    :return: The message of the helper or a message that it has no helpers
+    """
     if len(parser.helpers[key]) != 0:
         msg = "Las opciones para el comando " + key + " son: -"
         for opcion in parser.helpers[key]:
@@ -16,8 +23,18 @@ def print_helpers(parser, key):
 
 
 class Command:
+    """
+    Command base class which all the commands will inherit from
+    """
 
     def do_execute(self, parser, *args):
+        """
+        Base definition of do_execute which every other single class will implement
+        
+        :param parser: The parser who called the command
+        :param args: All the arguments obtained by the parser
+        :return: Messages of execution 
+        """
         pass
 
 
