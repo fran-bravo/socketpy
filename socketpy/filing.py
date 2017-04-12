@@ -1,9 +1,8 @@
 import os
 from shutil import rmtree, copytree
-from .analyzer import Analyzer
+from socketpy.analyzer import Analyzer
 from socketpy.exceptions import FileError, ArgumentError
-
-PACK_BODY = "{\n\t//TODO: definir funcion\n}\n"
+from socketpy.formatter import ModelFormatter, PackHFormatter, PackCFormatter
 
 
 class FileLineWrapper(object):
@@ -17,96 +16,6 @@ class FileLineWrapper(object):
     def readline(self):
         self.line += 1
         return self.f.readline()
-
-
-class ModelFormatter(object):
-
-    def __init__(self, includes=None, defined_struct=None, struct=None):
-        self.file = "modelos.h"
-        self.includes = includes
-        self.defined_struct = defined_struct
-        self.struct = struct
-
-    def prepare_lines(self, lines):
-        header, footer = lines.split("#endif")
-        lines = header + self.includes + self.defined_struct + self.struct + "#endif\n" + footer
-        return lines
-
-    def inspect(self, struct, fd, filing):
-        inside_struct_body = False
-        for line in fd.f:
-            filing._count_defined_structs(line)
-            filing._found_define_struct(line, struct)
-            if line != "\n":  # Ignoro lineas en blanco
-                if inside_struct_body:  # Ignoro de la struct ya definida
-                    if struct in line:  # Delimito el final del typedef
-                        inside_struct_body = not inside_struct_body
-                else:
-                    if struct in line:  # Encuentro struct ya definida
-                        inside_struct_body = not inside_struct_body
-                    else:  # Lineas comunes
-                        filing.lines += line
-        return
-
-
-class PackCFormatter(object):
-
-    def __init__(self, package=None, package_functions=None, unpackage_functions=None):
-        self.file = "paquetes.c"
-        self.package = package
-        self.package_functions = package_functions
-        self.unpackage_functions = unpackage_functions
-
-    def prepare_lines(self, lines):
-        header, middle, footer = lines.split("} //Fin del switch\n")
-        lines = header + self.package + "\t} //Fin del switch\n" + middle + self.package + \
-                     "\t} //Fin del switch\n" + footer
-        header, middle, footer = lines.split("// Auxiliar\n")
-        lines = header + "// Auxiliar\n" + middle + self.package_functions + PACK_BODY + \
-                     "// Auxiliar\n" + self.unpackage_functions + PACK_BODY + footer
-        return lines
-
-    def inspect(self, struct, fd, filing):
-        inside_switch_body = False
-        inside_function = False
-        for line in fd.f:
-            if line != "\n":  # Ignoro lineas en blanco
-                if inside_switch_body:  # Ignoro lineas del switch ya definido
-                    if "break;" in line:  # Delimito el final del switch
-                        inside_switch_body = not inside_switch_body
-                elif inside_function:
-                    if "}\n" == line:
-                        inside_function = not inside_function
-                else:
-                    if struct.upper() in line:  # Encuentro switch ya definido
-                        filing.update = True
-                        inside_switch_body = not inside_switch_body
-                    elif struct.lower() in line:  # Encuentro funcion de la struct
-                        inside_function = not inside_function
-                    else:  # Lineas comunes
-                        filing.lines += line
-        return
-
-
-class PackHFormatter(object):
-
-    def __init__(self, package_functions=None, unpackage_functions=None):
-        self.file = "paquetes.h"
-        self.package_functions = package_functions
-        self.unpackage_functions = unpackage_functions
-
-    def prepare_lines(self, lines):
-        header, footer = lines.split("// Auxiliar\n")
-        lines = header + "// Auxiliar\n" + self.package_functions + ";\n" + \
-                              self.unpackage_functions + ";\n" + footer
-        return lines
-
-    def inspect(self, struct, fd, filing):
-        for line in fd.f:
-            if line != "\n":  # Ignoro lineas en blanco
-                if struct.lower() not in line:    # Lineas comunes
-                    filing.lines += line
-        return
 
 
 class Filer:
@@ -128,6 +37,13 @@ class Filer:
     # Public Interface #
 
     def write_model(self, *args):
+        """
+        Writes socket files accordingly for handling the new struct to be defined with args
+        
+        :param args: list of arguments obtained by the parser 
+        :return: str with the struct name
+        """
+
         parameters = args[0]
         struct = parameters.pop(0)
         self._read_file(struct, ModelFormatter())
@@ -141,12 +57,24 @@ class Filer:
         return struct
 
     def examine_context(self):
+        """
+        Examines the context of the filer at any given time
+        
+        :return: None 
+        """
+
         print("Struct: ", self.struct)
         print("Defined Struct: ", self.defined_struct)
         print("Package: ", self.package)
         return
 
     def delete_sockets(self):
+        """
+        Deletes the sockets folder and its files
+        
+        :return: None or an error 
+        """
+
         try:
             print("Borrando sockets")
             rmtree(os.path.join(self.working_directory, "sockets"))
@@ -154,9 +82,13 @@ class Filer:
         except OSError as e:
             raise FileError(e)
 
-    # Private Methods #
-
     def copy_templates(self):
+        """
+        Copies the base tree of the templates used by socketpy in the directory where it is called
+        
+        :return: str with the path to new sockets folder 
+        """
+
         base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
         path = os.path.join(self.working_directory, "sockets")
         # print("Base: ", base_path, "Path: ", path)
@@ -165,14 +97,19 @@ class Filer:
             print("\tCopiados templates de sockets")
         return path
 
-    def _generate_templates(self):
-        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "headers")
-        path = os.path.join(self.working_directory, "sockets")
-        print("Path {}\tBasepath {}".format(path, base_path))
+    # Private Methods #
 
     # File Reading #
 
     def _read_file(self, struct, formatter):
+        """
+        Reads a specific file and filters its lines based on the struct
+        
+        :param struct: str with the name of the struct to be added 
+        :param formatter: Formatter which specifies the file and the way to inspect it
+        :return: None
+        """
+
         print("\tLeyendo archivo {}".format(formatter.file))
         path = os.path.join(os.path.join(self.working_directory, "sockets"), formatter.file)
         fd = FileLineWrapper(open(path, "r"))
@@ -181,18 +118,41 @@ class Filer:
 
     # Inner Processing #
 
-    def _found_define_struct(self, line, struct):
+    def found_define_struct(self, line, struct):
+        """
+        Validates if the line is a DEFINE of the struct. If so, turns on update flag and decreases number_struct counter
+        
+        :param line: str of the line analyzed 
+        :param struct: str with the name of the struct
+        :return: None
+        """
+
         if struct.upper() in line:
             self.update = True
             self.number_struct -= 1
         return
 
-    def _count_defined_structs(self, line):
+    def count_defined_structs(self, line):
+        """
+        Validates if the line is a DEFINE expresion. If so, increase number_struct counter
+        
+        :param line: str of the line analyzed 
+        :return: None
+        """
+
         if "#define D" in line:
             self.number_struct += 1
         return
 
     def _process_input(self, parameters, struct):
+        """
+        Processes all the parameters and the struct and defines lines to be added in the files
+        
+        :param parameters: list of parameters which define attributes of the struct 
+        :param struct: str with the name of the struct
+        :return: None
+        """
+
         print("\tProcesando input")
         self._process_arguments(parameters)
         self._process_struct(struct)
@@ -202,6 +162,13 @@ class Filer:
         return
 
     def _process_arguments(self, parameters):
+        """
+        Iterates the parameters and adds the couple selector-tipo to attributes dict
+        
+        :param parameters: list of parameters of the struct
+        :return: None or error
+        """
+
         for par in parameters:
             selector, tipo = self._split_selector(par)
             if self.analyzer.analyze_type(tipo):
@@ -212,9 +179,14 @@ class Filer:
                 raise TypeError('El tipo de dato: ' + tipo + ' no es un tipo valido')
 
     def _add_include(self):
+        """
+        If the source file of the struct added is not included it adds it to the file
+        
+        :return: None 
+        """
+        
         print("Source {}".format(self.analyzer.source_file))
         if (self.analyzer.source_file not in self.lines) and (self.analyzer.source_file != "modelos.h"):
-            print("Meh")
             self.includes += "#include <" + self.analyzer.source_file + ">\n"
 
     def _define_struct(self, struct):

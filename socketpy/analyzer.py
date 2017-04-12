@@ -25,10 +25,9 @@ class Analyzer:
 
     def all(self):
         built = '|'.join(self.escaped(self.c_built_ins))
-        print(built)
         types = '|'.join(self.escaped(self.c_types))
         built_arr = '|'.join(self.escaped(self.c_built_ins)) + '\[[0-9]*\]'
-        types_arr = '|'.join(self.escaped(self.c_types)) + '\[[0-9]*\]'
+        types_arr = '|'.join(self.escaped(self.c_array_types)) + '\[[0-9]*\]'
         return '(' + built + types + built_arr + types_arr + ')'
 
     @staticmethod
@@ -73,7 +72,7 @@ class Analyzer:
     def _get_types(self):
         db = Database()
         self.c_built_ins = list(map(lambda tup: tup[0], db.select_built_types()))
-        self.c_built_in_array_types = r'^(' + '|'.join(self.c_built_ins) + ')\[[0-9]*\]'
+        self.c_built_in_array_types = r'^(' + '|'.join(self.escaped(self.c_built_ins)) + ')\[[0-9]*\]'
         self.c_types = list(map(lambda tup: tup[0], db.select_types()))
-        self.c_array_types = r'^(' + '|'.join(self.c_types) + ')\[[0-9]*\]'
+        self.c_array_types = r'^(' + '|'.join(self.escaped(self.c_types)) + ')\[[0-9]*\]'
         db.close_connection()
