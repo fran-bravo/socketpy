@@ -78,7 +78,6 @@ class Filer:
         print("Struct: ", self.struct)
         print("Defined Struct: ", self.defined_struct)
         print("Package: ", self.package)
-        return
 
     def delete_sockets(self):
         """
@@ -126,7 +125,6 @@ class Filer:
         path = os.path.join(os.path.join(self.working_directory, "sockets"), formatter.file)
         fd = FileLineWrapper(open(path, "r"))
         formatter.inspect(struct, fd, self)
-        return
 
     # Inner Processing #
 
@@ -142,7 +140,6 @@ class Filer:
         if struct.upper() in line:
             self.update = True
             self.number_struct -= 1
-        return
 
     def count_defined_structs(self, line):
         """
@@ -154,7 +151,6 @@ class Filer:
 
         if "#define D" in line:
             self.number_struct += 1
-        return
 
     def _process_input(self, parameters, struct):
         """
@@ -171,7 +167,6 @@ class Filer:
         self._define_struct(struct)
         self._process_package(struct)
         self._process_package_functions(struct)
-        return
 
     def _process_arguments(self, parameters):
         """
@@ -211,7 +206,6 @@ class Filer:
 
         if not self.update:
             self.defined_struct = "\n#define D_" + struct.upper() + " " + str(self.number_struct) + "\n"
-        return
 
     def _process_struct(self, struct):
         """
@@ -226,7 +220,6 @@ class Filer:
             attr = "\t" + str(self.attributes[key]) + " " + key + ";\n"
             self.struct += attr
         self.struct += "} __attribute__ ((__packed__)) " + struct + ";\n\n"
-        return
 
     def _process_package(self, struct):
         """
@@ -238,14 +231,13 @@ class Filer:
 
         self.package = "\tcase D_" + struct.upper() + \
                        ":\n\t\t\t//TODO: definir funcion\n\t\t\tbreak;\n\t"
-        return
 
     def _process_package_functions(self, struct):
         """
         Defines basic package and unpackage functions signatures associated to struct
         
         :param struct: str name of the struct
-        :return: 
+        :return: None
         """
 
         print("Procesando funciones")
@@ -269,7 +261,6 @@ class Filer:
         self._write_file(formatter.file)
         self.update = False
         self.lines = ""
-        return
 
     # Generate Formatters
 
@@ -314,7 +305,6 @@ class Filer:
         fd = FileLineWrapper(open(path, "w"))
         fd.f.writelines(self.lines)
         fd.f.close()
-        return
 
     @staticmethod
     def _split_selector(string):

@@ -26,7 +26,7 @@ class Database:
         Executes a query on the cursor of the db
         
         :param query: str of the query to be executed 
-        :return: None
+        :return: sqlite3.Cursor with the result of the query
         """
 
         return self.cursor.execute(query)
@@ -157,7 +157,6 @@ class Database:
         print("\tDesconectada base de datos")
         os.remove(self.database)
         print("\tEliminada base de datos")
-        return
 
     def destroy_tables(self):
         """

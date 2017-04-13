@@ -57,6 +57,6 @@ class Route:
         :param route: str with the route 
         :return: None
         """
-        
+
         self.database.insert_route(route)
 

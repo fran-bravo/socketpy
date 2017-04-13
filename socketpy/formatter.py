@@ -67,7 +67,6 @@ class ModelFormatter(Formatter):
                         inside_struct_body = not inside_struct_body
                     else:  # Lineas comunes
                         filing.lines += line
-        return
 
 
 class PackCFormatter(Formatter):
@@ -122,7 +121,6 @@ class PackCFormatter(Formatter):
                         inside_function = not inside_function
                     else:  # Lineas comunes
                         filing.lines += line
-        return
 
 
 class PackHFormatter(Formatter):
@@ -157,4 +155,3 @@ class PackHFormatter(Formatter):
             if line != "\n":  # Ignoro lineas en blanco
                 if struct.lower() not in line:    # Lineas comunes
                     filing.lines += line
-        return
