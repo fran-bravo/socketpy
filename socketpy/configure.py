@@ -90,7 +90,7 @@ t_header despaquetizarHeader(char * header){
 
 // Auxiliar
 
-#endif"""
+// End"""
 PACKH = """#ifndef PAQUETES_H_
 #define PAQUETES_H_
 

@@ -1,4 +1,4 @@
-PACK_BODY = "{\n\t//TODO: definir funcion\n}\n"
+PACK_BODY = "{\n\t//TODO: definir funcion\n"
 
 
 class Formatter(object):
@@ -71,8 +71,9 @@ class ModelFormatter(Formatter):
 
 class PackCFormatter(Formatter):
 
-    def __init__(self, package=None, package_functions=None, unpackage_functions=None):
+    def __init__(self, struct=None, package=None, package_functions=None, unpackage_functions=None):
         self.file = "paquetes.c"
+        self.struct = struct
         self.package = package
         self.package_functions = package_functions
         self.unpackage_functions = unpackage_functions
@@ -84,13 +85,16 @@ class PackCFormatter(Formatter):
         :param lines: str with the lines of paquetes.c file 
         :return: lines
         """
-
         header, middle, footer = lines.split("} //Fin del switch\n")
         lines = header + self.package + "\t} //Fin del switch\n" + middle + self.package + \
-                     "\t} //Fin del switch\n" + footer
+                                        "\t} //Fin del switch\n" + footer
         header, middle, footer = lines.split("// Auxiliar\n")
-        lines = header + "// Auxiliar\n" + middle + self.package_functions + PACK_BODY + \
-                     "// Auxiliar\n" + self.unpackage_functions + PACK_BODY + footer
+        lines = header + "// Auxiliar\n" + middle + self.package_functions + \
+                         PACK_BODY + "\tt_stream * paquete = malloc(sizeof(t_stream));\n" + \
+                         "\treturn paquete;\n}\n" + "// Auxiliar\n" + self.unpackage_functions + \
+                         PACK_BODY + "\tint tamanoCodigo = sizeof(" + self.struct + ");\n" + \
+                         "\t" + self.struct + "* estructuraDestino = malloc(tamanoCodigo);\n" + \
+                         "\treturn estructuraDestino;\n}\n" + footer
         return lines
 
     def inspect(self, struct, fd, filing):

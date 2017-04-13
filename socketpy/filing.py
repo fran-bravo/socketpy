@@ -63,7 +63,7 @@ class Filer:
         # self.examine_context()
         self._write_with_format(self._generate_model_formatter())
         self._read_file(struct, PackCFormatter())
-        self._write_with_format(self._generate_pack_c_formatter())
+        self._write_with_format(self._generate_pack_c_formatter(struct))
         self._read_file(struct, PackHFormatter())
         self._write_with_format(self._generate_pack_h_formatter())
         return struct
@@ -272,14 +272,14 @@ class Filer:
 
         return ModelFormatter(self.includes, self.defined_struct, self.struct)
 
-    def _generate_pack_c_formatter(self):
+    def _generate_pack_c_formatter(self, struct):
         """
         Generates a formatter for paquetes.c
         
         :return: PackCFormatter 
         """
 
-        return PackCFormatter(self.package, self.package_functions, self.unpackage_functions)
+        return PackCFormatter(struct, self.package, self.package_functions, self.unpackage_functions)
 
     def _generate_pack_h_formatter(self):
         """
