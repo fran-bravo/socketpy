@@ -123,7 +123,7 @@ class Analyzer:
         
         :return: None 
         """
-        
+
         db = Database()
         self.c_built_ins = list(map(lambda tup: tup[0], db.select_built_types()))
         self.c_built_in_array_types = r'^(' + '|'.join(self.escaped(self.c_built_ins)) + ')\[[0-9]*\]'

@@ -15,8 +15,10 @@ class TestParser(TestCase):
         assert result == "help"
 
     def test_parse_command_create(self):
+        self.parser.parse(["config"])
         result = self.parser.parse(["create", "socket", "test"])
         assert result == "create"
+        self.parser.parse(["deconfig"])
 
     def test_parse_fail(self):
         with pytest.raises(ParseError):
