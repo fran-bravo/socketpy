@@ -192,7 +192,6 @@ class Filer:
         :return: None 
         """
 
-        print("Source {}".format(self.analyzer.source_file))
         if (self.analyzer.source_file not in self.lines) and (self.analyzer.source_file != "modelos.h"):
             self.includes += "#include <" + self.analyzer.source_file + ">\n"
 
