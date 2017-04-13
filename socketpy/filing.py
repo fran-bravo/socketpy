@@ -11,9 +11,21 @@ class FileLineWrapper(object):
         self.line = 0
 
     def close(self):
+        """
+        Closes the file
+        
+        :return: None 
+        """
+
         return self.f.close()
 
     def readline(self):
+        """
+        Reads a line and increases line counter
+        
+        :return: str lines read 
+        """
+        
         self.line += 1
         return self.f.readline()
 
@@ -184,17 +196,31 @@ class Filer:
         
         :return: None 
         """
-        
+
         print("Source {}".format(self.analyzer.source_file))
         if (self.analyzer.source_file not in self.lines) and (self.analyzer.source_file != "modelos.h"):
             self.includes += "#include <" + self.analyzer.source_file + ">\n"
 
     def _define_struct(self, struct):
+        """
+        Defines the line for the #define expression associated for struct if neccessary
+        
+        :param struct: str name of the struct 
+        :return: None
+        """
+
         if not self.update:
             self.defined_struct = "\n#define D_" + struct.upper() + " " + str(self.number_struct) + "\n"
         return
 
     def _process_struct(self, struct):
+        """
+        Defines the typedef expression associated for struct with its attributes
+        
+        :param struct: str name of the struct 
+        :return: None
+        """
+
         self.struct = "\ntypedef struct " + struct + "{\n"
         for key in self.attributes.keys():
             attr = "\t" + str(self.attributes[key]) + " " + key + ";\n"
@@ -203,11 +229,25 @@ class Filer:
         return
 
     def _process_package(self, struct):
+        """
+        Defines the case expression for the struct in the switch of paquetes.c
+        
+        :param struct: str name of the struct 
+        :return: None
+        """
+
         self.package = "\tcase D_" + struct.upper() + \
                        ":\n\t\t\t//TODO: definir funcion\n\t\t\tbreak;\n\t"
         return
 
     def _process_package_functions(self, struct):
+        """
+        Defines basic package and unpackage functions signatures associated to struct
+        
+        :param struct: str name of the struct
+        :return: 
+        """
+
         print("Procesando funciones")
         self.package_functions = "t_stream* package_" + struct + "(" + struct + "* original_struct, " + \
                                  "uint8_t struct_type)"
@@ -217,6 +257,13 @@ class Filer:
     # File Writing
 
     def _write_with_format(self, formatter):
+        """
+        Writes a file with lines accordingly to what the formatter specifies
+        
+        :param formatter: Formatter which prepares the lines and defines the file to write 
+        :return: 
+        """
+
         print("\tEscribiendo {}".format(formatter.file))
         self.lines = formatter.prepare_lines(self.lines)
         self._write_file(formatter.file)
@@ -227,24 +274,57 @@ class Filer:
     # Generate Formatters
 
     def _generate_model_formatter(self):
+        """
+        Generates a formatter for modelos.h
+        
+        :return: ModelFormatter 
+        """
+
         return ModelFormatter(self.includes, self.defined_struct, self.struct)
 
     def _generate_pack_c_formatter(self):
+        """
+        Generates a formatter for paquetes.c
+        
+        :return: PackCFormatter 
+        """
+
         return PackCFormatter(self.package, self.package_functions, self.unpackage_functions)
 
     def _generate_pack_h_formatter(self):
+        """
+        Generates a formatter for paquetes.h
+        
+        :return: PackHFormatter 
+        """
+
         return PackHFormatter(self.package_functions, self.unpackage_functions)
 
     # Auxiliary
 
     def _write_file(self, file):
+        """
+        Opens the file and writes the lines in self.lines
+        
+        :param file: File to write 
+        :return: None
+        """
+
         path = os.path.join(os.path.join(self.working_directory, "sockets"), file)
         fd = FileLineWrapper(open(path, "w"))
         fd.f.writelines(self.lines)
         fd.f.close()
+        return
 
     @staticmethod
     def _split_selector(string):
+        """
+        Splits a string with the selector ':' and gets type and selector
+        
+        :param string: str to split 
+        :return: (str, str) with type and selector
+        """
+
         if len(list(string.split(":"))) == 2:
             tipo, selector = string.split(":")
         else:
