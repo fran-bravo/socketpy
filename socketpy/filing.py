@@ -25,7 +25,7 @@ class FileLineWrapper(object):
         
         :return: str lines read 
         """
-        
+
         self.line += 1
         return self.f.readline()
 

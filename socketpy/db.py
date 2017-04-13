@@ -19,7 +19,7 @@ class Database:
 
         print("Creando tablas")
         self._create_types_table()
-        self._create_routes_table()
+        self.create_routes_table()
 
     def execute_query(self, query):
         """
@@ -230,7 +230,7 @@ class Database:
             type_source VARCHAR(50))""")
         print("\tCreada tabla de tipos")
 
-    def _create_routes_table(self):
+    def create_routes_table(self):
         """
         Creates routes table
         

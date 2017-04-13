@@ -12,19 +12,51 @@ class Route:
     # Public Interface #
 
     def create_route_table(self):
-        self.database._create_routes_table()
+        """
+        Creates the routes table in the database
+        
+        :return: None 
+        """
+
+        self.database.create_routes_table()
 
     def load_route(self, directorios):
+        """
+        Formats the route and inserts it in the database
+        
+        :param directorios: str with the route to add 
+        :return: None
+        """
+
         route = os.sep.join(directorios)
         print("Ruta a insertar: ", route)
         self.database.insert_route(route)
 
     def flush_routes(self):
+        """
+        Deletes the routes in the database
+        
+        :return: None 
+        """
+
         self.database.flush_routes()
 
     def close_connection(self):
+        """
+        Closes the connection to the database
+        
+        :return: None 
+        """
+
         self.database.close_connection()
 
     def _insert_route(self, route):
+        """
+        Inserts the route in the database
+        
+        :param route: str with the route 
+        :return: None
+        """
+        
         self.database.insert_route(route)
 
