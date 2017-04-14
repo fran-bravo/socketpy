@@ -8,10 +8,10 @@ python:
   - 3.6
 
 install:
-  - sudo pip3 install -r requirements.txt
+  - pip3 install -r requirements.txt
 script:
   - sudo py.test --cov=./test
 after_script:
   - sudo pytest test/
 after_success:
-  - codecov --toke=4ecf15c6-3a4c-43f2-82ba-1b0df712079c
+  - codecov --token=4ecf15c6-3a4c-43f2-82ba-1b0df712079c
