@@ -19,7 +19,7 @@ class Compiler:
         self._build_objects()
         headers = self._find_headers()
         for h in headers:
-            call(["cp", "-u", h, "/usr/include"])
+            call(["sudo", "cp", "-u", h, "/usr/include"])
         os.chdir(self.working_directory)
 
     def _find_headers(self):
@@ -48,4 +48,4 @@ class Compiler:
 
         call(["gcc", "-c", "-fpic", "paquetes.c"])
         call(["gcc", "-shared", "-o", "libsockets.so", "paquetes.o"])
-        call(["cp", "-u", "libsockets.so", "/usr/lib"])
+        call(["sudo", "cp", "-u", "libsockets.so", "/usr/lib"])
