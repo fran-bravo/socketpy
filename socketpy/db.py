@@ -1,4 +1,5 @@
 import sqlite3, os
+import shutil
 
 
 class Database:
@@ -156,6 +157,7 @@ class Database:
         self.close_connection()
         print("\tDesconectada base de datos")
         os.remove(self.database)
+        shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database"))
         print("\tEliminada base de datos")
 
     def destroy_tables(self):

@@ -9,7 +9,7 @@ python:
 install:
   - pip3 install -r requirements.txt
 script:
-  - py.test --cov=./test
+  - py.test --cov=./
 after_script:
   - pytest test/
 after_success:

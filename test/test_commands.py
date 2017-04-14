@@ -5,6 +5,7 @@ from socketpy.parser import Parser
 from socketpy.exceptions import ParseError
 from socketpy.filing import FileLineWrapper
 from socketpy.db import Database
+from socketpy.commands import print_helpers
 
 
 INCLUDES = "/usr/include"
@@ -39,10 +40,127 @@ class TestCommands(TestCase):
                 out = io.StringIO()
                 sys.stderr = out
                 self.parser.parse(["help", "asda"])
-                output = out.getvalue().strip()
-                assert output == 'El comando ingresado no existe\nLos comandos disponibles son: config, create, delete, flush, help, route\nERROR: Unknown command "help"'
             finally:
                 sys.stderr = saved_stdout
+
+    def test_command_help_create(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "create"])
+            output = out.getvalue().strip()
+            msg = "El comando create permite tanto inicializar la estructura de directorios necesario para el "
+            msg += "uso de socketpy, así como crear modelos de estructuras utilizadas para el envío de datos por sockets\n"
+            msg += print_helpers(self.parser, 'create')
+            msg = msg[:-1]
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
+
+    def test_command_help_config(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "config"])
+            output = out.getvalue().strip()
+            msg = "El comando config se encarga de analizar los archivos del proyecto, extraer "
+            msg += "los tipos de datos con los que trabaja y encargarse de agregarlos a los datos "
+            msg += "permitidos para la creación de modelos\n"
+            msg += print_helpers(self.parser, 'config')
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
+
+    def test_command_help_flush(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "flush"])
+            output = out.getvalue().strip()
+            msg = "El comando flush elimina información particular de proyectos en los que se utilizó socketpy "
+            msg += "anteriormente, ya sean tipos de datos o rutas\n"
+            msg += print_helpers(self.parser, 'flush')
+            msg = msg[:-1]
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
+
+    def test_command_help_embed(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "embed"])
+            output = out.getvalue().strip()
+            msg = "El comando embed permite insertar un tipo de dato especifico "
+            msg += "de forma manual y directa, con la finalidad de proveer un "
+            msg += "mecanismo para agregar tipos que no se han detectado durante la configuracion\n"
+            msg += "El formato para agregar tipos es [nombre_tipo] [archivo_source].\n"
+            msg += "Ejemplo: socketpy embed t_log log.h\n"
+            msg += print_helpers(self.parser, 'embed')
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
+
+    def test_command_help_reset(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "reset"])
+            output = out.getvalue().strip()
+            msg = "El comando reset reestablece la base de datos a su estado inicial "
+            msg += "(Existente por motivos de facilidad de comprensión)\n"
+            msg += print_helpers(self.parser, 'reset')
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
+
+    def test_command_help_deconfig(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "deconfig"])
+            output = out.getvalue().strip()
+            msg = "El comando deconfig elimina la base de datos que utiliza socketpy "
+            msg += "y elimina la carpeta de sockets "
+            msg += "(Existente por motivos de manejo entre versiones)\n"
+            msg += print_helpers(self.parser, 'deconfig')
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
+
+    def test_command_help_route(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "route"])
+            output = out.getvalue().strip()
+            msg = "El comando route agrega una ruta en la que socketpy debe explorar para hallar archivos "
+            msg += "sources que se utilizan en los #includes\n"
+            msg += print_helpers(self.parser, 'route')
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
+
+    def test_command_help_delete(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help", "delete"])
+            output = out.getvalue().strip()
+            msg = "El comando delete destruye el directorio de sockets en el que se ubican los sources de "
+            msg += "socketpy\n"
+            msg += print_helpers(self.parser, 'delete')
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
 
     def test_command_create_socket(self):
         try:

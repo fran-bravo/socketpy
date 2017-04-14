@@ -1,7 +1,6 @@
 #ifndef MODELOS_H_
 #define MODELOS_H_
 
-
 typedef struct {
     int length;
     char *data;
