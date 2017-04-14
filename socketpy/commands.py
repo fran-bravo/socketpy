@@ -147,9 +147,9 @@ class FlushCommand(Command):
                 db.flush_types()
                 db.close_connection()
             elif tipo.lower() == "routes":
-                db = Database()
-                db.flush_routes()
-                db.close_connection()
+                route = Route()
+                route.flush_routes()
+                route.close_connection()
         except FileError as exc:
             raise FlushError(exc)
 

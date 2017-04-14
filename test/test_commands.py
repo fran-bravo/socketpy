@@ -213,6 +213,18 @@ class TestCommands(TestCase):
         finally:
             self._destroy_socketpy()
 
+    def test_command_config_with_route(self):
+        try:
+            self._init_socketpy()
+            self.parser.parse(["route", "/usr/include"])
+            self.parser.parse(["config"])
+            db = Database()
+            types = db.get_types()
+
+            assert "FILE" in types
+        finally:
+            self._destroy_socketpy()
+
     def test_command_flush_route(self):
         try:
             self._init_socketpy()
