@@ -7,8 +7,6 @@ from socketpy.analyzer import Analyzer
 MODEL = """#ifndef MODELOS_H_
 #define MODELOS_H_
 
-#include  <commons/collections/list.h>
-
 typedef struct {
     int length;
     char *data;

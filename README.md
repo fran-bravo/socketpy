@@ -1,6 +1,6 @@
 # socketpy
 [![Build Status](https://travis-ci.com/fran-bravo/socketpy.svg?token=xiwZKBqBy5Nsagz6fEGD&branch=master)](https://travis-ci.com/fran-bravo/socketpy)
-[![Python Version](https://img.shields.io/badge/python-3.2%20%2B-blue.svg)](https://www.python.org/)
+[![Python Version](https://img.shields.io/badge/python-3.3%20%2B-blue.svg)](https://www.python.org/)
 
 socketpy provides a CLI for the creation of basic models and packaging functions for data structures, used in sockets, in C.
 It's interface helps avoid common boilerplater code used for sending structs with sockets.
