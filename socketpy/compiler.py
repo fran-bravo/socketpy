@@ -20,6 +20,7 @@ class Compiler:
         headers = self._find_headers()
         for h in headers:
             call(["cp", "-u", h, "/usr/include"])
+        os.chdir(self.working_directory)
 
     def _find_headers(self):
         """

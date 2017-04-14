@@ -77,7 +77,6 @@ class Parser:
         else:
             parameters = list(args)[0]
             command = parameters.pop(0)
-
         try:
             return self.commands[command](*args)
         except Exception as exc:

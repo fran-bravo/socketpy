@@ -6,5 +6,11 @@ python:
   - 3.5
   - 3.6
 
-script: "pip3 install -r requirements.txt"
-after_script: "pytest test/"
+install:
+  - pip3 install -r requirements.txt
+script:
+  - coverage run test/
+after_script:
+  - pytest test/
+after_success:
+  - codecov --toke=4ecf15c6-3a4c-43f2-82ba-1b0df712079c
