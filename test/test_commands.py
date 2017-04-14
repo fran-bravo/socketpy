@@ -1,9 +1,10 @@
+import pytest, sys, io, os
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
 from unittest import TestCase
 from socketpy.parser import Parser
 from socketpy.exceptions import ParseError
 from socketpy.filing import FileLineWrapper
 from socketpy.db import Database
-import pytest, sys, io, os
 
 
 INCLUDES = "/usr/include"

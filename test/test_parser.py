@@ -1,6 +1,8 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
+import pytest
 from unittest import TestCase
 from socketpy.parser import Parser, ParseError
-import pytest
 
 
 class TestParser(TestCase):
