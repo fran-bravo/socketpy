@@ -6,6 +6,10 @@ from socketpy.db import Database
 import pytest, sys, io, os
 
 
+INCLUDES = "/usr/include"
+LIBS = "/usr/lib"
+
+
 class TestCommands(TestCase):
     parser = Parser()
 
@@ -125,4 +129,20 @@ class TestCommands(TestCase):
             assert "t_prueba" in types
         finally:
             db.close_connection()
+            self._destroy_socketpy()
+
+    def test_command_compile(self):
+        try:
+            self._init_socketpy()
+            self.parser.parse(["create", "model", "persona", "dni:int", "nombre:char*", "edad:int"])
+            self.parser.parse(["compile"])
+
+            paquetes = os.path.join(INCLUDES, "paquetes.h")
+            modelos = os.path.join(INCLUDES, "modelos.h")
+            library = os.path.join(LIBS, "libsockets.so")
+
+            assert os.path.exists(paquetes)
+            assert os.path.exists(modelos)
+            assert os.path.exists(library)
+        finally:
             self._destroy_socketpy()
