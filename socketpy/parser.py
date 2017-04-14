@@ -1,7 +1,7 @@
 from socketpy.exceptions import CommandError, ParseError, SOCKETPY_ERRORS
 from socketpy.commands import HelpCommand, CreateCommand, ConfigCommand, FlushCommand, \
                               DeleteCommand, RouteCommand, DeconfigCommand, ResetCommand, \
-                              EmbedCommand
+                              EmbedCommand, CompileCommand
 
 
 class Parser:
@@ -11,10 +11,10 @@ class Parser:
                          'config': self.config, 'flush': self.flush,
                          'delete': self.delete, 'route': self.route,
                          'deconfig': self.deconfig, 'reset': self.reset,
-                         'embed': self.embed}
+                         'embed': self.embed, 'compile': self.compile}
         self.helpers = {'help': [], 'create': ['model', 'socket'], 'config': [],
                         'flush': ['types', 'routes'], 'delete': [], 'route': [],
-                        'deconfig': [], 'reset': [], 'embed': []}
+                        'deconfig': [], 'reset': [], 'embed': [], 'compile': []}
 
     # Public Interface
 
@@ -55,6 +55,10 @@ class Parser:
     def embed(self, *args):
         EmbedCommand().do_execute(self, *args)
         return "embed"
+
+    def compile(self, *args):
+        CompileCommand().do_execute(self, *args)
+        return "compile"
 
     # Parse
 

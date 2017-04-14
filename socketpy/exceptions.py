@@ -34,4 +34,9 @@ class EmbedError(CommandError):
     pass
 
 
-SOCKETPY_ERRORS = [ParseError, HelpError, CommandError, CreateError, RouteError, FileError, ArgumentError, FlushError, EmbedError]
+class CompileError(CommandError):
+    pass
+
+SOCKETPY_ERRORS = [ParseError, HelpError, CommandError, CreateError,
+                   RouteError, FileError, ArgumentError, FlushError,
+                   EmbedError, CompileError]

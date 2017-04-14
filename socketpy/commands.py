@@ -1,8 +1,9 @@
-from socketpy.exceptions import CreateError, FileError, RouteError, HelpError, FlushError, EmbedError
-from socketpy.filing import Filer
-from socketpy.configure import Configure
+from socketpy.exceptions import CreateError, FileError, RouteError, HelpError, FlushError, EmbedError, CompileError
 from socketpy.db import Database
 from socketpy.route import Route
+from socketpy.filing import Filer
+from socketpy.compiler import Compiler
+from socketpy.configure import Configure
 
 
 def print_helpers(parser, key):
@@ -100,11 +101,9 @@ class CreateCommand(Command):
         model = self.filer.write_model(*args)
         print("Insertando modelo en base de datos")
         self.db.insert_type(model, "modelos.h")
-        return
 
     def _create_socket(self, *args):
         self.filer.copy_templates()
-        return
 
     def __str__(self):
         msg = "El comando create permite tanto inicializar la estructura de directorios necesario para el "
@@ -251,3 +250,13 @@ class EmbedCommand(Command):
         msg += "El formato para agregar tipos es [nombre_tipo] [archivo_source].\n"
         msg += "Ejemplo: socketpy embed t_log log.h\n"
         return msg
+
+
+class CompileCommand(Command):
+
+    def do_execute(self, parser, *args):
+        try:
+            compiler = Compiler()
+            compiler.compile_library()
+        except Exception as exc:
+            raise CompileError(exc)
