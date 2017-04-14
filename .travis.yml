@@ -10,8 +10,8 @@ python:
 install:
   - pip3 install -r requirements.txt
 script:
-  - sudo py.test --cov=./test
+  - py.test --cov=./test
 after_script:
-  - sudo pytest test/
+  - pytest test/
 after_success:
   - codecov --token=4ecf15c6-3a4c-43f2-82ba-1b0df712079c
