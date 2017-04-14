@@ -44,7 +44,7 @@ class Compiler:
         
         :return: None 
         """
-        
+
         call(["gcc", "-c", "-fpic", "paquetes.c"])
         call(["gcc", "-shared", "-o", "libsockets.so", "paquetes.o"])
         call(["cp", "-u", "libsockets.so", "/usr/lib"])
