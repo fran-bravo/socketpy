@@ -2,7 +2,7 @@ import pytest, sys, io, os
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
 from unittest import TestCase
 from socketpy.parser import Parser
-from socketpy.exceptions import ParseError
+from socketpy.exceptions import ParseError, CreateError, FlushError, RouteError, EmbedError
 from socketpy.filing import FileLineWrapper
 from socketpy.db import Database
 from socketpy.commands import print_helpers
@@ -20,7 +20,21 @@ class TestCommands(TestCase):
         self.parser.parse(["create", "socket"])
 
     def _destroy_socketpy(self):
+        self.parser.parse(['delete'])
         self.parser.parse(['deconfig'])
+
+    def test_command_help(self):
+        saved_stdout = sys.stdout
+        try:
+            out = io.StringIO()
+            sys.stdout = out
+            self.parser.parse(["help"])
+            output = out.getvalue().strip()
+            msg = "Comandos disponibles: "
+            msg += self.parser.msg_format_commands()
+            assert output == msg
+        finally:
+            sys.stdout = saved_stdout
 
     def test_command_help(self):
         saved_stdout = sys.stdout
@@ -166,8 +180,8 @@ class TestCommands(TestCase):
         try:
             self._init_socketpy()
             cwd = os.getcwd()
-            print("Directory {}".format(cwd))
             subdirs = list(os.walk(cwd))[0][1]
+
             assert "sockets" in subdirs
         finally:
             self._destroy_socketpy()
@@ -277,3 +291,47 @@ class TestCommands(TestCase):
             assert os.path.exists(library)
         finally:
             self._destroy_socketpy()
+
+    def test_command_reset(self):
+        try:
+            self._init_socketpy()
+            self.parser.parse(["reset"])
+
+            db = Database()
+            types = db.get_types()
+
+            assert types == []
+        finally:
+            self._destroy_socketpy()
+
+#   Errors  #
+
+    def test_command_create_wrong_parameter(self):
+        with pytest.raises(CreateError):
+            self._init_socketpy()
+            self.parser.parse(["create", "database"])
+
+    def test_command_create_missing_parameters(self):
+        with pytest.raises(CreateError):
+            self._init_socketpy()
+            self.parser.parse(["create"])
+
+    def test_command_flush_missing_parameters(self):
+        with pytest.raises(FlushError):
+            self._init_socketpy()
+            self.parser.parse(["flush"])
+
+    def test_command_flush_wrong_parameter(self):
+        with pytest.raises(FlushError):
+            self._init_socketpy()
+            self.parser.parse(["flush", "database"])
+
+    def test_command_route_missing_parameter(self):
+        with pytest.raises(RouteError):
+            self._init_socketpy()
+            self.parser.parse(["route"])
+
+    def test_command_embed_missing_parameter(self):
+        with pytest.raises(EmbedError):
+            self._init_socketpy()
+            self.parser.parse(["embed"])

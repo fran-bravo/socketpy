@@ -80,11 +80,11 @@ class Parser:
         try:
             return self.commands[command](*args)
         except Exception as exc:
-            if type(exc) in SOCKETPY_ERRORS:
+            if type(exc) not in SOCKETPY_ERRORS:
                 raise ParseError(exc)
             else:
                 # msg = ['Unknown command "%s"' % command]
-                raise CommandError(exc)
+                raise exc
 
     def msg_format_commands(self):
         """

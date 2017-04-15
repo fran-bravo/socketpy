@@ -150,6 +150,9 @@ class FlushCommand(Command):
                 route = Route()
                 route.flush_routes()
                 route.close_connection()
+            else:
+                msg = "Opcion invalida para el comando create"
+                raise FlushError(msg)
         except FileError as exc:
             raise FlushError(exc)
 
@@ -197,10 +200,8 @@ class DeconfigCommand(Command):
 
     def do_execute(self, parser, *args):
         db = Database()
-        filer = Filer()
         print("Eliminando configuracion")
         db.destroy_database()
-        filer.delete_sockets()
 
     def __str__(self):
         msg = "El comando deconfig elimina la base de datos que utiliza socketpy "
