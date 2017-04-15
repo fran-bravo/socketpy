@@ -68,17 +68,6 @@ class Filer:
         self._write_with_format(self._generate_pack_h_formatter())
         return struct
 
-    def examine_context(self):
-        """
-        Examines the context of the filer at any given time
-        
-        :return: None 
-        """
-
-        print("Struct: ", self.struct)
-        print("Defined Struct: ", self.defined_struct)
-        print("Package: ", self.package)
-
     def delete_sockets(self):
         """
         Deletes the sockets folder and its files

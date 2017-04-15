@@ -20,6 +20,7 @@ class TestParser(TestCase):
         self.parser.parse(["config"])
         result = self.parser.parse(["create", "socket", "test"])
         assert result == "create"
+        self.parser.parse(["delete"])
         self.parser.parse(["deconfig"])
 
     def test_parse_fail(self):

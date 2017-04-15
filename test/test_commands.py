@@ -15,11 +15,11 @@ LIBS = "/usr/lib"
 class TestCommands(TestCase):
     parser = Parser()
 
-    def _init_socketpy(self):
+    def setUp(self):
         self.parser.parse(["config"])
         self.parser.parse(["create", "socket"])
 
-    def _destroy_socketpy(self):
+    def tearDown(self):
         self.parser.parse(['delete'])
         self.parser.parse(['deconfig'])
 
@@ -177,18 +177,13 @@ class TestCommands(TestCase):
             sys.stdout = saved_stdout
 
     def test_command_create_socket(self):
-        try:
-            self._init_socketpy()
-            cwd = os.getcwd()
-            subdirs = list(os.walk(cwd))[0][1]
+        cwd = os.getcwd()
+        subdirs = list(os.walk(cwd))[0][1]
 
-            assert "sockets" in subdirs
-        finally:
-            self._destroy_socketpy()
+        assert "sockets" in subdirs
 
     def test_command_create_model(self):
         try:
-            self._init_socketpy()
             self.parser.parse(["create", "model", "persona", "dni:int", "nombre:char*", "edad:int"])
             cwd = os.getcwd()
             path = os.path.join(os.path.join(cwd, "sockets"), "modelos.h")
@@ -197,11 +192,9 @@ class TestCommands(TestCase):
             assert any(list(map(lambda line: "persona" in line, fd.f)))
         finally:
             fd.close()
-            self._destroy_socketpy()
 
     def test_command_create_model_update(self):
         try:
-            self._init_socketpy()
             self.parser.parse(["create", "model", "persona", "dni:int", "nombre:char*", "edad:int"])
             self.parser.parse(["create", "model", "persona", "dni:int", "nombre:char*", "edad:int", "hijo:persona"])
             cwd = os.getcwd()
@@ -214,34 +207,24 @@ class TestCommands(TestCase):
         finally:
             fd1.close()
             fd2.close()
-            self._destroy_socketpy()
 
     def test_command_route(self):
-        try:
-            self._init_socketpy()
-            self.parser.parse(["route", "/usr/include"])
-            db = Database()
-            routes = db.get_routes()
+        self.parser.parse(["route", "/usr/include"])
+        db = Database()
+        routes = db.get_routes()
 
-            assert "/usr/include" in routes
-        finally:
-            self._destroy_socketpy()
+        assert "/usr/include" in routes
 
     def test_command_config_with_route(self):
-        try:
-            self._init_socketpy()
-            self.parser.parse(["route", "/usr/include"])
-            self.parser.parse(["config"])
-            db = Database()
-            types = db.get_types()
+        self.parser.parse(["route", "/usr/include"])
+        self.parser.parse(["config"])
+        db = Database()
+        types = db.get_types()
 
-            assert "FILE" in types
-        finally:
-            self._destroy_socketpy()
+        assert "FILE" in types
 
     def test_command_flush_route(self):
         try:
-            self._init_socketpy()
             self.parser.parse(["route", "/usr/include"])
             self.parser.parse(["flush", "routes"])
             db = Database()
@@ -250,11 +233,9 @@ class TestCommands(TestCase):
             assert routes == []
         finally:
             db.close_connection()
-            self._destroy_socketpy()
 
     def test_command_flush_types(self):
         try:
-            self._init_socketpy()
             self.parser.parse(["flush", "types"])
             db = Database()
             types = db.get_types()
@@ -262,11 +243,9 @@ class TestCommands(TestCase):
             assert "t_stream" not in types
         finally:
             db.close_connection()
-            self._destroy_socketpy()
 
     def test_command_embed(self):
         try:
-            self._init_socketpy()
             self.parser.parse(["embed", "t_prueba", "prueba.h"])
             db = Database()
             types = db.get_types()
@@ -274,64 +253,49 @@ class TestCommands(TestCase):
             assert "t_prueba" in types
         finally:
             db.close_connection()
-            self._destroy_socketpy()
 
     def test_command_compile(self):
-        try:
-            self._init_socketpy()
-            self.parser.parse(["create", "model", "persona", "dni:int", "nombre:char*", "edad:int"])
-            self.parser.parse(["compile"])
+        self.parser.parse(["create", "model", "persona", "dni:int", "nombre:char*", "edad:int"])
+        self.parser.parse(["compile"])
 
-            paquetes = os.path.join(INCLUDES, "paquetes.h")
-            modelos = os.path.join(INCLUDES, "modelos.h")
-            library = os.path.join(LIBS, "libsockets.so")
+        paquetes = os.path.join(INCLUDES, "paquetes.h")
+        modelos = os.path.join(INCLUDES, "modelos.h")
+        library = os.path.join(LIBS, "libsockets.so")
 
-            assert os.path.exists(paquetes)
-            assert os.path.exists(modelos)
-            assert os.path.exists(library)
-        finally:
-            self._destroy_socketpy()
+        assert os.path.exists(paquetes)
+        assert os.path.exists(modelos)
+        assert os.path.exists(library)
 
     def test_command_reset(self):
-        try:
-            self._init_socketpy()
-            self.parser.parse(["reset"])
+        self.parser.parse(["reset"])
 
-            db = Database()
-            types = db.get_types()
+        db = Database()
+        types = db.get_types()
 
-            assert types == []
-        finally:
-            self._destroy_socketpy()
+        assert types == []
 
 #   Errors  #
 
     def test_command_create_wrong_parameter(self):
         with pytest.raises(CreateError):
-            self._init_socketpy()
             self.parser.parse(["create", "database"])
 
     def test_command_create_missing_parameters(self):
         with pytest.raises(CreateError):
-            self._init_socketpy()
             self.parser.parse(["create"])
 
     def test_command_flush_missing_parameters(self):
         with pytest.raises(FlushError):
-            self._init_socketpy()
             self.parser.parse(["flush"])
 
     def test_command_flush_wrong_parameter(self):
         with pytest.raises(FlushError):
-            self._init_socketpy()
             self.parser.parse(["flush", "database"])
 
     def test_command_route_missing_parameter(self):
         with pytest.raises(RouteError):
-            self._init_socketpy()
             self.parser.parse(["route"])
 
     def test_command_embed_missing_parameter(self):
         with pytest.raises(EmbedError):
-            self._init_socketpy()
             self.parser.parse(["embed"])

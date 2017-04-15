@@ -11,15 +11,6 @@ class Route:
 
     # Public Interface #
 
-    def create_route_table(self):
-        """
-        Creates the routes table in the database
-        
-        :return: None 
-        """
-
-        self.database.create_routes_table()
-
     def load_route(self, directorios):
         """
         Formats the route and inserts it in the database
@@ -30,7 +21,7 @@ class Route:
 
         route = os.sep.join(directorios)
         print("Ruta a insertar: ", route)
-        self.database.insert_route(route)
+        self._insert_route(route)
 
     def flush_routes(self):
         """
