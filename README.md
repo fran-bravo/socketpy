@@ -1,13 +1,14 @@
 # socketpy
 [![Build Status](https://travis-ci.com/fran-bravo/socketpy.svg?token=xiwZKBqBy5Nsagz6fEGD&branch=master)](https://travis-ci.com/fran-bravo/socketpy)
 [![Python Version](https://img.shields.io/badge/python-3.3%20%2B-blue.svg)](https://www.python.org/)
+[![PyPI version](https://badge.fury.io/py/socketpy.svg)](https://badge.fury.io/py/socketpy)
 [![Codecov](https://codecov.io/gh/fran-bravo/socketpy/branch/master/graph/badge.svg?token=QWk3SwZ3eG)](https://codecov.io/gh/fran-bravo/socketpy)
 
 socketpy provides a CLI for the creation of basic models and packaging functions for data structures, used in sockets, in C.
 It's interface helps avoid common boilerplater code used for sending structs with sockets.
 
 ## Installation
-To install this package, first you need to have python 3.2 or higher in your operating system.
+To install this package, first you need to have python 3.3 or higher in your operating system.
 
 Check [Python](https://www.python.org/downloads/source/) for information about it's installation.
 
