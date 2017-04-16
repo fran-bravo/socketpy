@@ -52,18 +52,6 @@ class Analyzer:
 
         return list(map(re.escape, array))
 
-    def examine(self):
-        """
-        Prints the types of the anlyzer at any given time
-        
-        :return: None 
-        """
-
-        print(self.c_built_ins)
-        print(self.c_built_in_array_types)
-        print(self.c_types)
-        print(self.c_array_types)
-
     def _validate_source(self, tipo):
         """
         Validates if the type is from a source file
