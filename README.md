@@ -24,13 +24,12 @@ will take care of the installation of the package.
 
 *   `help`: displays all available commands for socketpy or more information about a specific command.
 *   `delete`: eliminates the sockets directory.
-*   `deconfig`: deconfigs socketpy.
+*   `deconfig`: destroys socketpy's database.
 *   `flush`: deletes types from old projects on the db.
-*   `reset`: resets socketpy db.
+*   `reset`: resets socketpy's db.
 *   `route`: allows you to add a route to specific source and header files which will be used for type validation. `socketpy route /usr/include/commons`
 *   `embed`: lets you add a specific data type and its associated source file. `socketpy embed t_log log.h`
-
-
+*   `compile`: compiles the sources in sockets folder into a shared library.
 
 ## Contributing
 1. Fork it!
