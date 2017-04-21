@@ -34,7 +34,7 @@ class TestCommands(TestCase):
         finally:
             sys.stdout = saved_stdout
 
-    def test_command_help(self):
+    def test_command_help_help(self):
         saved_stdout = sys.stdout
         try:
             out = io.StringIO()

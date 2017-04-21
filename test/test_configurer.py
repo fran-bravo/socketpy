@@ -34,7 +34,7 @@ class TestConfigure(TestCase):
         types = self.configurer.database.get_types()
         assert "FILE" in types
 
-    def test_typedef_basic_struct(self):
+    def test_typedef_basic(self):
         self.configurer._get_type_from_typedef_sentence("typedef uint8_t int8;", "modelos.h")
         types = self.configurer.database.get_types()
         assert "int8" in types

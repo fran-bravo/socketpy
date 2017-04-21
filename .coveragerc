@@ -23,6 +23,7 @@ exclude_lines =
 omit =
     socketpy/__main__.py
     socketpy/__init__.py
+    socketpy/templates.py
     ./__init__.py
     ./setup.py
 
