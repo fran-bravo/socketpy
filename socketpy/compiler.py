@@ -24,18 +24,36 @@ class Compiler:
         os.chdir(self.working_directory)
 
     def decompile_library(self):
+        """
+        Deletes compiled files from system and removes built objects in sockets
+        
+        :return: 
+        """
+
         self._delete_includes()
         self._delete_lib()
         self._unbuild_objects()
         os.chdir(self.working_directory)
 
     def _delete_includes(self):
+        """
+        Removes headers in includes
+        
+        :return: 
+        """
+
         os.chdir(self.includes)
         headers = self._find_headers()
         for h in headers:
             call(["sudo", "rm", h])
 
     def _delete_lib(self):
+        """
+        Removes the libsockets file from /lib
+        
+        :return: 
+        """
+
         os.chdir(self.libs)
         call(["sudo", "rm", "libsockets.so"])
 
