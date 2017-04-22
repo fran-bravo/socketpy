@@ -1,7 +1,6 @@
 #ifndef SOCKET_H_
 #define SOCKET_H_
 
-#include <stdbool.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -53,7 +52,7 @@ char* socket_unirDireccion(char* ip, int puerto);
 //FUNCIONES DE STRINGS
 
 char**  string_split(char * text, char * separator);
-char** _string_split(char* text, char* separator, bool(*condition)(char*, int));
+char** _string_split(char* text, char* separator, int(*condition)(char*, int));
 void 	string_append(char ** original, char * string_to_add);
 char*   string_from_format(const char* format, ...);
 char*	string_duplicate(char* original);

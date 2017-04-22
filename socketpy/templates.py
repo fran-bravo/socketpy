@@ -493,14 +493,14 @@ int socket_cerrarConexion(int socket){
 }
 
 char **string_split(char *text, char *separator) {
-	bool _is_last_token(char* next, int _) {
+	int _is_last_token(char* next, int _) {
 		return next[0] != '\0';
 	}
 	return _string_split(text, separator, _is_last_token);
 }
 
 
-char** _string_split(char* text, char* separator, bool(*condition)(char*, int)) {
+char** _string_split(char* text, char* separator, int(*condition)(char*, int)) {
 	char **substrings = NULL;
 	int size = 0;
 
@@ -605,7 +605,7 @@ char* socket_unirDireccion(char* ip, int puerto);
 //FUNCIONES DE STRINGS
 
 char**  string_split(char * text, char * separator);
-char** _string_split(char* text, char* separator, bool(*condition)(char*, int));
+char** _string_split(char* text, char* separator, int(*condition)(char*, int));
 void 	string_append(char ** original, char * string_to_add);
 char*   string_from_format(const char* format, ...);
 char*	string_duplicate(char* original);
