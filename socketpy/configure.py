@@ -2,7 +2,7 @@ import sqlite3, os, re, sys
 from socketpy.filing import FileLineWrapper
 from socketpy.db import Database
 from socketpy.analyzer import Analyzer
-from socketpy.templates import MODEL, PACKC, PACKH
+from socketpy.templates import MODEL, PACKC, PACKH, SOCKC, SOCKH
 
 
 class Configure:
@@ -56,6 +56,8 @@ class Configure:
         self._create_file("modelos.h", MODEL)
         self._create_file("paquetes.h", PACKH)
         self._create_file("paquetes.c", PACKC)
+        self._create_file("socket.h", SOCKH)
+        self._create_file("socket.c", SOCKC)
         print("\tGenerados templates de sources a utilizar")
 
     def gather_types(self):

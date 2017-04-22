@@ -81,8 +81,8 @@ class Compiler:
         """
 
         os.chdir(self.sockets)
-        call(["gcc", "-c", "-fpic", "paquetes.c"])
-        call(["gcc", "-shared", "-o", "libsockets.so", "paquetes.o"])
+        call(["gcc", "-c", "-fpic", "paquetes.c", "socket.c"])
+        call(["gcc", "-shared", "-o", "libsockets.so", "paquetes.o", "socket.o"])
         call(["sudo", "cp", "-u", "libsockets.so", "/usr/lib"])
 
     def _unbuild_objects(self):
@@ -94,4 +94,5 @@ class Compiler:
 
         os.chdir(self.sockets)
         call(["rm", "paquetes.o"])
+        call(["rm", "socket.o"])
         call(["rm", "libsockets.so"])
