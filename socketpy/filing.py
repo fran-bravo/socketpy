@@ -169,20 +169,8 @@ class Filer:
             selector, tipo = self._split_selector(par)
             if self.analyzer.analyze_type(tipo):
                 self.attributes[selector] = tipo
-                if self.analyzer.source_type:
-                    self._add_include()
             else:
                 raise TypeError('El tipo de dato: ' + tipo + ' no es un tipo valido')
-
-    def _add_include(self):
-        """
-        If the source file of the struct added is not included it adds it to the file
-        
-        :return: None 
-        """
-
-        if (self.analyzer.source_file not in self.lines) and (self.analyzer.source_file != "modelos.h"):
-            self.includes += "#include <" + self.analyzer.source_file + ">\n"
 
     def _define_struct(self, struct):
         """
