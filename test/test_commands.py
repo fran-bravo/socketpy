@@ -111,14 +111,7 @@ class TestCommands(TestCase):
         assert os.path.exists(modelos)
         assert os.path.exists(library)
 
-    def test_command_decompile(self):
-        self.parser.parse(["create", "model", "persona", "dni:int", "nombre:char*", "edad:int"])
-        self.parser.parse(["compile"])
         self.parser.parse(["decompile"])
-
-        paquetes = os.path.join(INCLUDES, "paquetes.h")
-        modelos = os.path.join(INCLUDES, "modelos.h")
-        library = os.path.join(LIBS, "libsockets.so")
 
         assert not os.path.exists(paquetes)
         assert not os.path.exists(modelos)
