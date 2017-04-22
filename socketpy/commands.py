@@ -261,3 +261,13 @@ class CompileCommand(Command):
             compiler.compile_library()
         except Exception as exc:
             raise CompileError(exc)
+
+
+class DecompileCommand(Command):
+
+    def do_execute(self, parser, *args):
+        try:
+            compiler = Compiler()
+            compiler.decompile_library()
+        except Exception as exc:
+            raise CompileError(exc)
