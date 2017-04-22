@@ -20,7 +20,7 @@ class Compiler:
         self._build_objects()
         headers = self._find_headers()
         for h in headers:
-            call(["sudo", "cp", "-u", h, "/usr/include/"])
+            call(["echo", "utnso", "sudo", "-S", "cp", "-u", h, "/usr/include/"])
         os.chdir(self.working_directory)
 
     def decompile_library(self):
@@ -45,7 +45,7 @@ class Compiler:
         os.chdir(self.includes)
         headers = self._find_headers()
         for h in headers:
-            call(["sudo", "rm", h])
+            call(["echo", "utnso", "sudo", "-S", "rm", h])
 
     def _delete_lib(self):
         """
@@ -55,7 +55,7 @@ class Compiler:
         """
 
         os.chdir(self.libs)
-        call(["sudo", "rm", "libsockets.so"])
+        call(["echo", "utnso", "sudo", "-S", "rm", "libsockets.so"])
 
     def _find_headers(self):
         """
@@ -83,7 +83,7 @@ class Compiler:
         os.chdir(self.sockets)
         call(["gcc", "-c", "-fpic", "paquetes.c", "socket.c"])
         call(["gcc", "-shared", "-o", "libsockets.so", "paquetes.o", "socket.o"])
-        call(["sudo", "cp", "-u", "libsockets.so", "/usr/lib"])
+        call(["echo", "utnso", "sudo", "-S", "cp", "-u", "libsockets.so", "/usr/lib"])
 
     def _unbuild_objects(self):
         """
