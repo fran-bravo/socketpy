@@ -30,6 +30,7 @@ will take care of the installation of the package.
 *   `route`: allows you to add a route to specific source and header files which will be used for type validation. `socketpy route /usr/include/commons`
 *   `embed`: lets you add a specific data type and its associated source file. `socketpy embed t_log log.h`
 *   `compile`: compiles the sources in sockets folder into a shared library.
+*   `decompile`: removes compiled files from system and deletes built objects.
 
 ## Contributing
 1. Fork it!
