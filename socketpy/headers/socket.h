@@ -1,6 +1,8 @@
 #ifndef SOCKET_H_
 #define SOCKET_H_
 
+#include <stdbool.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <sys/types.h>
@@ -13,7 +15,6 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include "paquetes.h"
-#include <commons/string.h>
 
 #define MAX_EVENTS_EPOLL 60
 #define MAX_CONNECTION_SERVER 60 //VAMOS A ATENDER DE A 10 CONEXIONES COMO MAXIMO A LA VEZ
@@ -49,5 +50,12 @@ int socket_puerto(char* direccionCompleta);
 
 char* socket_unirDireccion(char* ip, int puerto);
 
+//FUNCIONES DE STRINGS
+
+char**  string_split(char * text, char * separator);
+char** _string_split(char* text, char* separator, bool(*condition)(char*, int));
+void 	string_append(char ** original, char * string_to_add);
+char*   string_from_format(const char* format, ...);
+char*	string_duplicate(char* original);
 
 #endif /* SOCKET_H_ */

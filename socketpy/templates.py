@@ -490,6 +490,66 @@ char* socket_unirDireccion(char* ip, int puerto){
  */
 int socket_cerrarConexion(int socket){
 	return close(socket);
+}
+
+char **string_split(char *text, char *separator) {
+	bool _is_last_token(char* next, int _) {
+		return next[0] != '\0';
+	}
+	return _string_split(text, separator, _is_last_token);
+}
+
+
+char** _string_split(char* text, char* separator, bool(*condition)(char*, int)) {
+	char **substrings = NULL;
+	int size = 0;
+
+	char *text_to_iterate = string_duplicate(text);
+
+	char *next = text_to_iterate;
+	char *str = text_to_iterate;
+
+	while(condition(next, size)) {
+		char* token = strtok_r(str, separator, &next);
+		if(token == NULL) {
+			break;
+		}
+		str = NULL;
+		size++;
+		substrings = realloc(substrings, sizeof(char*) * size);
+		substrings[size - 1] = string_duplicate(token);
+	};
+
+	if (next[0] != '\0') {
+		size++;
+		substrings = realloc(substrings, sizeof(char*) * size);
+		substrings[size - 1] = string_duplicate(next);
+	}
+
+	size++;
+	substrings = realloc(substrings, sizeof(char*) * size);
+	substrings[size - 1] = NULL;
+
+	free(text_to_iterate);
+	return substrings;
+}
+
+void string_append(char** original, char* string_to_add) {
+	*original = realloc(*original, strlen(*original) + strlen(string_to_add) + 1);
+	strcat(*original, string_to_add);
+}
+
+char* string_from_format(const char* format, ...) {
+	char* nuevo;
+	va_list arguments;
+	va_start(arguments, format);
+	nuevo = string_from_vformat(format, arguments);
+	va_end(arguments);
+	return nuevo;
+}
+
+char* string_duplicate(char* original) {
+	return strdup(original);
 }"""
 
 SOCKH = """#ifndef SOCKET_H_
@@ -507,7 +567,6 @@ SOCKH = """#ifndef SOCKET_H_
 #include <errno.h>
 #include <sys/ioctl.h>
 #include "paquetes.h"
-#include <commons/string.h>
 
 #define MAX_EVENTS_EPOLL 60
 #define MAX_CONNECTION_SERVER 60 //VAMOS A ATENDER DE A 10 CONEXIONES COMO MAXIMO A LA VEZ
@@ -543,5 +602,12 @@ int socket_puerto(char* direccionCompleta);
 
 char* socket_unirDireccion(char* ip, int puerto);
 
+//FUNCIONES DE STRINGS
+
+char**  string_split(char * text, char * separator);
+char** _string_split(char* text, char* separator, bool(*condition)(char*, int));
+void 	string_append(char ** original, char * string_to_add);
+char*   string_from_format(const char* format, ...);
+char*	string_duplicate(char* original);
 
 #endif /* SOCKET_H_ */"""
