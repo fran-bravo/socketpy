@@ -36,6 +36,7 @@ class Configure:
         print("\tInicializando db")
         self.database.create_tables()
         self._load_basic_types()
+        self._load_basic_routes()
 
     def close_connection(self):
         """
@@ -215,8 +216,8 @@ class Configure:
         if "<" in line:
             file = line.split("<")[-1]
             file = re.sub('[>\n]', '', file)
-            #if "/" in file:
-            #    file = file.split("/")[-1]
+            if "/" in file:
+                file = file.split("/")[-1]
             print("Archivo {}".format(file))
         if "\"" in line:
             file = line.split("\"")[-2]
@@ -250,6 +251,17 @@ class Configure:
                  ("void*", "builtin"), ("char*", "builtin"),
                  ]
         self.database.insert_types(types)
+
+    def _load_basic_routes(self):
+        """
+        Inserts basic routes into the database
+
+        :return: None 
+        """
+
+        # TODO: Add more routes
+        route = "/usr/include/commons/"
+        self.database.insert_route(route)
 
     # Directories initialization #
 

@@ -1,7 +1,6 @@
 #ifndef SOCKET_H_
 #define SOCKET_H_
 
-#include <stdarg.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <sys/types.h>
