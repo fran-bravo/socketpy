@@ -1,5 +1,5 @@
 # socketpy
-[![Build Status](https://travis-ci.com/fran-bravo/socketpy.svg?token=xiwZKBqBy5Nsagz6fEGD&branch=master)](https://travis-ci.com/fran-bravo/socketpy)
+
 [![Python Version](https://img.shields.io/badge/python-3.3%20%2B-blue.svg)](https://www.python.org/)
 [![PyPI version](https://badge.fury.io/py/socketpy.svg)](https://badge.fury.io/py/socketpy)
 [![Codecov](https://codecov.io/gh/fran-bravo/socketpy/branch/master/graph/badge.svg?token=QWk3SwZ3eG)](https://codecov.io/gh/fran-bravo/socketpy)
