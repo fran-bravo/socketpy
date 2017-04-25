@@ -257,7 +257,7 @@ class Configure:
 
     def _load_basic_routes(self):
         """
-        Inserts basic routes into the database
+        Inserts basic routes into the database for the search of types
 
         :return: None 
         """
