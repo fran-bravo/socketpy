@@ -158,7 +158,7 @@ int socket_conectarCliente(int sockfd,char *serverIp, int serverPort){
         socketInfo.sin_family = AF_INET;
         socketInfo.sin_port = htons(serverPort); //host to network short
         socketInfo.sin_addr.s_addr = inet_addr(serverIp);
-        memset(&(socketInfo.sin_zero),\'\0\',8); // PONGO A 0 EL RESTO DE LA ESTRUCTURA
+        memset(&(socketInfo.sin_zero),'\\0',8); // PONGO A 0 EL RESTO DE LA ESTRUCTURA
         // ME CONECTO CON LA DIRECCIÓN DE SOCKETINFO
         //SIEMPRE VERIFICANDO QUE NO DEN -1 LAS FUNCIONES O 0 EN CASO DE RECV() -- SOLO PARA SERVER IGUAL :)
 
@@ -215,7 +215,7 @@ int socket_crearServidor(char *ip, int port){
 	miSocket.sin_family = AF_INET;
 	miSocket.sin_port = htons(port);
 	miSocket.sin_addr.s_addr = inet_addr(ip);
-	memset(&(miSocket.sin_zero),'\0',8); //NI LE PRESTEN ATENCION A ESTO
+	memset(&(miSocket.sin_zero),'\\0',8); //NI LE PRESTEN ATENCION A ESTO
 
 	int yes = 1;
 	if (setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
@@ -260,7 +260,7 @@ int socket_crearServidorIpLocal(int port){
 	miSocket.sin_family = AF_INET;
 	miSocket.sin_port = htons(port);
 	miSocket.sin_addr.s_addr = INADDR_ANY;
-	memset(&(miSocket.sin_zero),'\0',8); //NI LE PRESTEN ATENCION A ESTO
+	memset(&(miSocket.sin_zero),'\\0',8); //NI LE PRESTEN ATENCION A ESTO
 
 	int yes = 1;
 	if (setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
@@ -297,7 +297,7 @@ int socket_crearServidorPuertoRandom(char *ip, int * port){
 	miSocket.sin_family = AF_INET;
 	miSocket.sin_port = htons(0);
 	miSocket.sin_addr.s_addr = inet_addr(ip);
-	memset(&(miSocket.sin_zero),'\0',8); //NI LE PRESTEN ATENCION A ESTO
+	memset(&(miSocket.sin_zero),'\\0',8); //NI LE PRESTEN ATENCION A ESTO
 
 	int yes = 1;
 	if (setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
@@ -494,7 +494,7 @@ int socket_cerrarConexion(int socket){
 
 char **string_split(char *text, char *separator) {
 	int _is_last_token(char* next, int _) {
-		return next[0] != '\0';
+		return next[0] != '\\0';
 	}
 	return _string_split(text, separator, _is_last_token);
 }
@@ -520,7 +520,7 @@ char** _string_split(char* text, char* separator, int(*condition)(char*, int)) {
 		substrings[size - 1] = string_duplicate(token);
 	};
 
-	if (next[0] != '\0') {
+	if (next[0] != '\\0') {
 		size++;
 		substrings = realloc(substrings, sizeof(char*) * size);
 		substrings[size - 1] = string_duplicate(next);

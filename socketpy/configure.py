@@ -5,6 +5,9 @@ from socketpy.analyzer import Analyzer
 from socketpy.templates import MODEL, PACKC, PACKH, SOCKC, SOCKH
 
 
+SOCKET_FILES = ["modelos.h", "socket.h", "paquetes.h"]
+
+
 class Configure:
 
     def __init__(self):
@@ -106,7 +109,7 @@ class Configure:
         struct_body = 0
         for line in fd.f:
             line = line.lstrip()
-            if line.startswith("#include"):     # Linea #include
+            if line.startswith("#include") and source in SOCKET_FILES:     # Linea #include
                 self._inspect_include(line)
             elif line.startswith("typedef") and line.endswith(";\n"):     # Linea typedef simple
                 self._get_type_from_typedef_sentence(line, source)
